@@ -4,6 +4,7 @@ import type {
   CommentUpdateRequest,
   CompareOverrides,
   DiffResponse,
+  FsBrowseResponse,
   Repo,
   Session,
   SessionCreateRequest,
@@ -101,5 +102,14 @@ export const api = {
       call<Comment>(`/comments/${id}/resolve`, { method: "POST" }),
     reopen: (id: string) =>
       call<Comment>(`/comments/${id}/reopen`, { method: "POST" }),
+  },
+  fs: {
+    browse: (path?: string, showHidden = false) => {
+      const q = new URLSearchParams();
+      if (path) q.set("path", path);
+      if (showHidden) q.set("show_hidden", "true");
+      const suffix = q.toString() ? `?${q.toString()}` : "";
+      return call<FsBrowseResponse>(`/fs/browse${suffix}`);
+    },
   },
 };

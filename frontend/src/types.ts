@@ -117,3 +117,16 @@ export interface CommentUpdateRequest {
   line_side?: LineSide;
   line_number?: number;
 }
+
+export interface FsEntry {
+  name: string;
+  path: string;
+  is_git: boolean;
+}
+
+export interface FsBrowseResponse {
+  path: string;
+  parent: string | null;
+  is_git: boolean;
+  entries: FsEntry[];
+}

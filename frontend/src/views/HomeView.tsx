@@ -3,6 +3,7 @@ import { Masthead } from "../components/Masthead";
 import { Banner } from "../components/Banner";
 import { Loading } from "../components/Loading";
 import { Colophon } from "../components/Colophon";
+import { DirectoryPicker } from "../components/DirectoryPicker";
 import { api, ApiError } from "../api";
 import type { Repo } from "../types";
 import { navigate, routes } from "../router";
@@ -14,6 +15,7 @@ export function HomeView() {
   const [path, setPath] = useState("");
   const [busy, setBusy] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
+  const [picking, setPicking] = useState(false);
 
   async function reload() {
     try {
@@ -79,15 +81,34 @@ export function HomeView() {
             <p className="intro">Enter the absolute path on disk.</p>
             <div className="form-row">
               <label htmlFor="repo-path">Repository path</label>
-              <input
-                id="repo-path"
-                type="text"
-                value={path}
-                placeholder="/Users/you/Code/your-monorepo"
-                onChange={(e) => setPath(e.target.value)}
-                autoComplete="off"
-                spellCheck={false}
-              />
+              <div className="path-field">
+                <input
+                  id="repo-path"
+                  type="text"
+                  value={path}
+                  placeholder="/Users/you/Code/your-monorepo"
+                  onChange={(e) => setPath(e.target.value)}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <button
+                  type="button"
+                  className="browse-btn"
+                  onClick={() => setPicking(true)}
+                  title="Browse the filesystem"
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M2 4.5 2 12.5 A 1 1 0 0 0 3 13.5 L13 13.5 A 1 1 0 0 0 14 12.5 L 14 6 A 1 1 0 0 0 13 5 L 8 5 L 6.5 3.5 L 3 3.5 A 1 1 0 0 0 2 4.5 Z"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                  </svg>
+                  Browse
+                </button>
+              </div>
               <span className="hint">Must be a git working tree.</span>
             </div>
             {registerError && (
@@ -145,6 +166,17 @@ export function HomeView() {
       </div>
 
       <Colophon />
+
+      {picking && (
+        <DirectoryPicker
+          initialPath={path || undefined}
+          onCancel={() => setPicking(false)}
+          onSelect={(selected) => {
+            setPath(selected);
+            setPicking(false);
+          }}
+        />
+      )}
     </main>
   );
 }
