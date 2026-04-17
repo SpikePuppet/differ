@@ -1,0 +1,54 @@
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.python-version
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Local databases and env files
+*.sqlite
+*.sqlite3
+*.db
+.env
+.env.*
+
+# Node / Bun
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.turbo/
+.next/
+.nuxt/
+.svelte-kit/
+coverage/
+dist/
+*.tsbuildinfo
+bun.lockb
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
