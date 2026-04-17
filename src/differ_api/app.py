@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from differ_api.api.errors import register_error_handlers
 from differ_api.api.routes.comments import router as comments_router
+from differ_api.api.routes.fs import router as fs_router
 from differ_api.api.routes.repos import router as repos_router
 from differ_api.api.routes.sessions import router as sessions_router
 from differ_api.db.session import Database
@@ -67,6 +68,7 @@ def create_app(database_url: str = "sqlite:///./differ.db") -> FastAPI:
     app.include_router(repos_router)
     app.include_router(sessions_router)
     app.include_router(comments_router)
+    app.include_router(fs_router)
     return app
 
 
