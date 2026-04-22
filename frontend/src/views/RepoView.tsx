@@ -3,6 +3,7 @@ import { Masthead } from "../components/Masthead";
 import { Banner } from "../components/Banner";
 import { Loading } from "../components/Loading";
 import { Colophon } from "../components/Colophon";
+import { BranchPicker } from "../components/BranchPicker";
 import { api, ApiError } from "../api";
 import type { Repo, Session } from "../types";
 import { navigate, routes } from "../router";
@@ -20,6 +21,12 @@ export function RepoView({ repoId }: { repoId: string }) {
   const [busy, setBusy] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
+  // branch picker
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerFor, setPickerFor] = useState<"base" | "head" | null>(null);
+  const [branchData, setBranchData] = useState<{ branches: string[]; current: string } | null>(null);
+  const [pickerError, setPickerError] = useState<string | null>(null);
+
   async function reload() {
     try {
       const [r, all] = await Promise.all([api.repos.get(repoId), api.sessions.list()]);
@@ -34,6 +41,20 @@ export function RepoView({ repoId }: { repoId: string }) {
   useEffect(() => {
     reload();
   }, [repoId]);
+
+  async function openPicker(field: "base" | "head") {
+    setPickerFor(field);
+    setPickerOpen(true);
+    setPickerError(null);
+    setBranchData(null);
+    try {
+      const data = await api.repos.branches(repoId);
+      setBranchData(data);
+    } catch (err) {
+      setPickerError(err instanceof Error ? err.message : String(err));
+      setBranchData({ branches: [], current: "" });
+    }
+  }
 
   async function onCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -128,25 +149,37 @@ export function RepoView({ repoId }: { repoId: string }) {
             <div className="form-grid-2">
               <div className="form-row">
                 <label htmlFor="base">Base ref</label>
-                <input
-                  id="base"
-                  value={baseRef}
-                  onChange={(e) => setBaseRef(e.target.value)}
-                  placeholder="main"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    id="base"
+                    value={baseRef}
+                    onChange={(e) => setBaseRef(e.target.value)}
+                    placeholder="main"
+                    autoComplete="off"
+                    spellCheck={false}
+                    style={{ flex: 1 }}
+                  />
+                  <button type="button" className="btn btn-sm" onClick={() => openPicker("base")}>
+                    Browse
+                  </button>
+                </div>
               </div>
               <div className="form-row">
                 <label htmlFor="head">Head ref</label>
-                <input
-                  id="head"
-                  value={headRef}
-                  onChange={(e) => setHeadRef(e.target.value)}
-                  placeholder="feature/your-branch"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    id="head"
+                    value={headRef}
+                    onChange={(e) => setHeadRef(e.target.value)}
+                    placeholder="feature/your-branch"
+                    autoComplete="off"
+                    spellCheck={false}
+                    style={{ flex: 1 }}
+                  />
+                  <button type="button" className="btn btn-sm" onClick={() => openPicker("head")}>
+                    Browse
+                  </button>
+                </div>
               </div>
             </div>
             <div className="form-row">
@@ -258,6 +291,25 @@ export function RepoView({ repoId }: { repoId: string }) {
       )}
 
       <Colophon />
+
+      {pickerOpen && pickerFor && (
+        <BranchPicker
+          branches={branchData?.branches}
+          current={branchData?.current}
+          allowUnspecified={pickerFor === "head"}
+          loading={!branchData && !pickerError}
+          onCancel={() => {
+            setPickerOpen(false);
+            setPickerFor(null);
+          }}
+          onSelect={(branch) => {
+            if (pickerFor === "base") setBaseRef(branch ?? "main");
+            else setHeadRef(branch ?? "");
+            setPickerOpen(false);
+            setPickerFor(null);
+          }}
+        />
+      )}
     </main>
   );
 }

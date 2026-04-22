@@ -2,14 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { romanize } from "../util";
 
 interface Props {
-  branches: string[];
-  current: string;
+  branches?: string[];
+  current?: string;
   allowUnspecified?: boolean;
+  loading?: boolean;
   onCancel: () => void;
   onSelect: (branch: string | null) => void;
 }
 
-export function BranchPicker({ branches, current, allowUnspecified, onCancel, onSelect }: Props) {
+export function BranchPicker({ branches = [], current = "", allowUnspecified, loading, onCancel, onSelect }: Props) {
   const [filter, setFilter] = useState("");
   const [cursor, setCursor] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
@@ -171,7 +172,9 @@ export function BranchPicker({ branches, current, allowUnspecified, onCancel, on
         </div>
 
         <div className="picker-list" ref={listRef} role="listbox" aria-label="Branches">
-          {ordered.length === 0 ? (
+          {loading ? (
+            <div className="picker-empty">Opening the bindery…</div>
+          ) : ordered.length === 0 ? (
             <div className="picker-empty">
               <div className="orn" style={{ margin: 0 }}>
                 ❧
