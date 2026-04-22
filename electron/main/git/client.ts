@@ -44,8 +44,16 @@ export class GitClient {
     }
   }
 
-  async ensureRefExists(repoPath: string, ref: string): Promise<void> {
-    await this._git(repoPath).revparse(['--verify', ref])
+  ensureRefExists(repoPath: string, ref: string): void {
+    try {
+      execSync(`git rev-parse --verify ${ref}`, {
+        cwd: repoPath,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+      })
+    } catch {
+      throw new Error(`Ref does not exist: ${ref}`)
+    }
   }
 
   async resolveRevision(

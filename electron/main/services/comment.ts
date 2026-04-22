@@ -13,7 +13,7 @@ export class CommentService {
     private gitClient: GitClient
   ) {}
 
-  createComment(data: {
+  async createComment(data: {
     session_id: string
     head_commit_sha: string
     base_commit_sha: string | null
@@ -24,7 +24,7 @@ export class CommentService {
   }) {
     const { session, repo } = this._loadSessionAndRepo(data.session_id)
     this._ensureWritable(session)
-    this._validateCommentPayload(repo.path, data)
+    await this._validateCommentPayload(repo.path, data)
 
     return this.commentRepo.create({
       session_id: data.session_id,
@@ -138,7 +138,7 @@ export class CommentService {
     }
   }
 
-  private _validateCommentPayload(
+  private async _validateCommentPayload(
     repoPath: string,
     data: {
       head_commit_sha: string
@@ -148,10 +148,10 @@ export class CommentService {
       line_number: number
       body: string
     }
-  ): void {
-    this.gitClient.resolveRevision(repoPath, { commit: data.head_commit_sha })
+  ): Promise<void> {
+    await this.gitClient.resolveRevision(repoPath, { commit: data.head_commit_sha })
     if (data.base_commit_sha) {
-      this.gitClient.resolveRevision(repoPath, { commit: data.base_commit_sha })
+      await this.gitClient.resolveRevision(repoPath, { commit: data.base_commit_sha })
     }
     validateRelativePath(data.file_path)
     if (data.line_side !== 'old' && data.line_side !== 'new') {

@@ -208,8 +208,8 @@ describe('CommentService', () => {
     headCommit = ctx.featureFirst
   }, 30000)
 
-  it('creates a comment', () => {
-    const comment = services.commentService.createComment({
+  it('creates a comment', async () => {
+    const comment = await services.commentService.createComment({
       session_id: sessionId,
       head_commit_sha: headCommit,
       base_commit_sha: ctx.mainTip,
@@ -335,7 +335,7 @@ describe('DiffService', () => {
       head_commit: ctx.featureFirst,
     })
 
-    services.commentService.createComment({
+    await services.commentService.createComment({
       session_id: sessionId,
       head_commit_sha: compareResult.head.commit,
       base_commit_sha: compareResult.base.commit,

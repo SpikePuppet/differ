@@ -17,7 +17,7 @@ export function registerCommentIpc(commentService: CommentService): void {
     })
   })
 
-  handle('comments:create', (payload: unknown) => {
+  handle('comments:create', async (payload: unknown) => {
     const req = payload as {
       sessionId: string
       head_commit_sha: string
