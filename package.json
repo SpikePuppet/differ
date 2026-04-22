@@ -1,0 +1,31 @@
+{
+  "name": "differ",
+  "version": "0.2.0",
+  "description": "The Review · A Journal of Code in Translation",
+  "type": "module",
+  "main": "./out/main/index.cjs",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit -p electron/main/tsconfig.json && tsc --noEmit -p electron/preload/tsconfig.json && tsc --noEmit -p frontend/tsconfig.json",
+    "dist": "electron-vite build && electron-builder"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.0",
+    "electron-vite": "^3.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}

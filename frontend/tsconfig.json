@@ -1,20 +1,15 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "strict": true,
     "noUncheckedIndexedAccess": true,
-    "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "allowJs": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["bun-types"]
+    "types": ["@types/react", "@types/react-dom", "@types/node"]
   },
-  "include": ["./**/*.ts", "./**/*.tsx"]
+  "include": ["./**/*.ts", "./**/*.tsx", "../electron/shared/**/*.ts"]
 }

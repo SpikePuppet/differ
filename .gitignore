@@ -46,6 +46,10 @@ dist/
 *.tsbuildinfo
 bun.lockb
 
+# Electron
+out/
+.electron-vite/
+
 # Logs
 *.log
 npm-debug.log*

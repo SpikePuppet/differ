@@ -1,2 +1,0 @@
-"""Branch diffing API package."""
-
