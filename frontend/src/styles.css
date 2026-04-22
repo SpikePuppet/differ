@@ -991,7 +991,7 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 .path-field {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 8px;
 }
 .path-field input {
   min-width: 0;
