@@ -13,13 +13,17 @@
     "dist": "electron-vite build && electron-builder"
   },
   "dependencies": {
+    "better-sqlite3": "^12.9.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.13.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^4.3.0",
     "electron": "^35.0.0",
     "electron-builder": "^26.0.0",
