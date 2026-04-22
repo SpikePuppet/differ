@@ -32,7 +32,7 @@ function createWindow() {
     height: 900,
     title: 'The Review · A Journal of Code in Translation',
     webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
     },
