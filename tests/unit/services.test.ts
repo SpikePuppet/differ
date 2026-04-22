@@ -140,6 +140,18 @@ describe('RepoService', () => {
   it('throws for missing repo', () => {
     expect(() => services.repoService.getRepo('no-such-id')).toThrow('not found')
   })
+
+  it('lists branches for a registered repo', async () => {
+    const repos = services.repoService.listRepos()
+    const result = await services.repoService.getRepoBranches(repos[0].id)
+    expect(result.branches).toContain('main')
+    expect(result.branches).toContain('feature/diff-comments')
+    expect(result.current).toBe('main')
+  })
+
+  it('throws when listing branches for missing repo', async () => {
+    await expect(services.repoService.getRepoBranches('no-such-id')).rejects.toThrow('not found')
+  })
 })
 
 describe('SessionService', () => {

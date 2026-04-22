@@ -135,6 +135,14 @@ describe('GitClient', () => {
     expect(paths).toContain('packages/pkg-a/notes.md')
     expect(paths).not.toContain('apps/web/app.js')
   })
+
+  it('lists local branches', async () => {
+    const result = await client.listBranches(repo.path)
+    expect(result.branches).toContain('main')
+    expect(result.branches).toContain('feature/diff-comments')
+    expect(result.branches).toContain('other/invalid-anchor')
+    expect(result.current).toBe('main')
+  })
 })
 
 describe('adaptDiff', () => {
