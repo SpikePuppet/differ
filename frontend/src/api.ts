@@ -9,6 +9,7 @@ import type {
   Session,
   SessionCreateRequest,
 } from "./types";
+import type { IpcResult } from "../../electron/shared/ipc";
 
 export class ApiError extends Error {
   constructor(
@@ -20,9 +21,26 @@ export class ApiError extends Error {
   }
 }
 
+function codeToStatus(code: string): number {
+  switch (code) {
+    case "NOT_FOUND": return 404;
+    case "CONFLICT": return 409;
+    case "VALIDATION": return 422;
+    case "BAD_REQUEST": return 400;
+    default: return 500;
+  }
+}
+
 async function call<T>(channel: string, payload?: unknown): Promise<T> {
-  const result = await window.electronAPI.invoke<T>(channel, payload);
-  return result;
+  const result = await window.electronAPI.invoke<IpcResult<T>>(channel, payload);
+  if (!result.success) {
+    throw new ApiError(
+      result.error.message,
+      codeToStatus(result.error.code),
+      result.error,
+    );
+  }
+  return result.data;
 }
 
 export const api = {
