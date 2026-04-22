@@ -48,6 +48,7 @@ export const api = {
     list: () => call<Repo[]>("repos:list"),
     get: (id: string) => call<Repo>("repos:get", { id }),
     create: (path: string) => call<Repo>("repos:create", { path }),
+    branches: (id: string) => call<{ branches: string[]; current: string }>("repos:branches", { id }),
   },
   sessions: {
     list: () => call<Session[]>("sessions:list"),
