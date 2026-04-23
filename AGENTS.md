@@ -347,3 +347,6 @@ If you see `NODE_MODULE_VERSION` mismatch errors, run the appropriate rebuild co
 - Cross-repo sessions
 - Remote clone management
 - Frontend runtime test suite (typecheck only)
+
+## Security Notes
+- The Anthropic API key (and any future settings) are stored **plaintext** in the local SQLite database (`userData/differ.db`). This is acceptable for a local-only, single-user tool, but the database file is readable by anyone with filesystem access.
