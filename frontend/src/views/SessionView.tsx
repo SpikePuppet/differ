@@ -12,8 +12,9 @@ import { Floater } from "../components/Floater";
 import { MarginNote } from "../components/MarginNote";
 import type { LineAnchor } from "../components/Line";
 import { api, ApiError } from "../api";
-import type { Comment, CompareOverrides, DiffResponse, Repo, Session } from "../types";
+import type { AiSummary, Comment, CompareOverrides, DiffResponse, Repo, Session } from "../types";
 import { navigate, routes } from "../router";
+import { EditorsAnnotation } from "../components/EditorsAnnotation";
 
 export function SessionView({ sessionId }: { sessionId: string }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -27,6 +28,8 @@ export function SessionView({ sessionId }: { sessionId: string }) {
   const [tab, setTab] = useState<ToolbarTab>("diff");
   const [selected, setSelected] = useState<LineAnchor | null>(null);
   const [busyCreating, setBusyCreating] = useState(false);
+  const [summary, setSummary] = useState<AiSummary | null>(null);
+  const [summarizing, setSummarizing] = useState(false);
 
   // overrides — allow editing base/head without saving to session
   const [baseRef, setBaseRef] = useState("");
@@ -50,6 +53,33 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         setBaseRef((prev) => prev || overrides?.base_ref || s.base_ref);
         setHeadRef((prev) => prev || overrides?.head_ref || s.head_ref || "");
         setError(null);
+
+        // Check for cached AI summary
+        try {
+          const cached = await api.ai.get(sessionId, d.head.commit);
+          if (cached) {
+            setSummary(cached);
+          } else {
+            // Attempt to generate if key is configured
+            setSummarizing(true);
+            api.ai
+              .generate(sessionId, d.head.commit, {
+                base: d.base,
+                head: d.head,
+                stats: d.stats,
+                files: d.files,
+              })
+              .then((generated) => {
+                if (generated) setSummary(generated);
+              })
+              .catch(() => {
+                // Silent fail — user sees normal diff
+              })
+              .finally(() => setSummarizing(false));
+          }
+        } catch {
+          // Silent fail — no summary available
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
@@ -215,6 +245,35 @@ export function SessionView({ sessionId }: { sessionId: string }) {
 
       <Frontispiece session={session} base={diff.base} head={diff.head} />
 
+      {summarizing && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            padding: "18px 0",
+            fontFamily: "Newsreader, serif",
+            fontStyle: "italic",
+            fontSize: "1.05rem",
+            color: "var(--ink-soft)",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "var(--gold)",
+              animation: "pulse 1.4s ease-in-out infinite",
+            }}
+          />
+          The editors are reviewing the manuscript…
+        </div>
+      )}
+
+      {summary?.overall && <EditorsAnnotation>{summary.overall}</EditorsAnnotation>}
+
       <StatsBoard
         filesChanged={diff.stats.files_changed}
         additions={diff.stats.additions}
@@ -298,6 +357,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
                 onEdit={onEdit}
                 showDropcap={i === 0}
                 isArchived={!!isArchived}
+                summary={summary?.files[f.new_path || f.old_path]}
               />
             ))
           )}

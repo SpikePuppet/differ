@@ -3,6 +3,7 @@ import type { Comment, DiffFile } from "../types";
 import { splitPath, romanize } from "../util";
 import { HunkBlock } from "./Hunk";
 import { MarginNote } from "./MarginNote";
+import { EditorsAnnotation } from "./EditorsAnnotation";
 import type { LineAnchor } from "./Line";
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
   onEdit: (c: Comment, body: string) => void;
   showDropcap: boolean;
   isArchived: boolean;
+  summary?: string;
 }
 
 const changeChipClass = (change: string): string => {
@@ -42,6 +44,7 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
     onEdit,
     showDropcap,
     isArchived,
+    summary,
   },
   ref,
 ) {
@@ -109,6 +112,8 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
           <span style={{ color: "var(--vermilion)" }}>−{file.deletions}</span> removed. Comments appear on the right.
         </p>
       )}
+
+      {summary && <EditorsAnnotation>{summary}</EditorsAnnotation>}
 
       {file.hunks.map((h, i) => (
         <HunkBlock

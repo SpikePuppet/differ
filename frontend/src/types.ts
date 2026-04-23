@@ -130,3 +130,8 @@ export interface FsBrowseResponse {
   is_git: boolean;
   entries: FsEntry[];
 }
+
+export interface AiSummary {
+  overall: string | null;
+  files: Record<string, string>;
+}

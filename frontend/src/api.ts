@@ -76,4 +76,10 @@ export const api = {
     get: (key: string) => call<string | null>("settings:get", { key }),
     set: (key: string, value: string) => call<void>("settings:set", { key, value }),
   },
+  ai: {
+    get: (sessionId: string, headCommitSha: string) =>
+      call<{ overall: string | null; files: Record<string, string> }>("ai:get", { sessionId, headCommitSha }),
+    generate: (sessionId: string, headCommitSha: string, diff: { base: unknown; head: unknown; stats: unknown; files: unknown[] }) =>
+      call<{ overall: string | null; files: Record<string, string> }>("ai:generate", { sessionId, headCommitSha, diff }),
+  },
 };

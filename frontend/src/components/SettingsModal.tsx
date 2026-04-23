@@ -5,8 +5,14 @@ interface Props {
   onClose: () => void;
 }
 
+const MODELS = [
+  { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet" },
+  { value: "claude-3-haiku-20240307", label: "Claude 3 Haiku" },
+];
+
 export function SettingsModal({ onClose }: Props) {
-  const [value, setValue] = useState("");
+  const [keyValue, setKeyValue] = useState("");
+  const [model, setModel] = useState(MODELS[0]!.value);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -14,10 +20,16 @@ export function SettingsModal({ onClose }: Props) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const existing = await api.settings.get("anthropic_api_key");
-      setValue(existing ?? "");
+      const [existingKey, existingModel] = await Promise.all([
+        api.settings.get("anthropic_api_key"),
+        api.settings.get("anthropic_model"),
+      ]);
+      setKeyValue(existingKey ?? "");
+      if (existingModel && MODELS.some((m) => m.value === existingModel)) {
+        setModel(existingModel);
+      }
     } catch {
-      setValue("");
+      setKeyValue("");
     } finally {
       setLoading(false);
     }
@@ -30,11 +42,12 @@ export function SettingsModal({ onClose }: Props) {
 
   async function save() {
     try {
-      await api.settings.set("anthropic_api_key", value.trim());
+      await api.settings.set("anthropic_api_key", keyValue.trim());
+      await api.settings.set("anthropic_model", model);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
-      alert("Could not save the key.");
+      alert("Could not save settings.");
     }
   }
 
@@ -89,14 +102,30 @@ export function SettingsModal({ onClose }: Props) {
               ref={inputRef}
               id="anthropic-key"
               type="password"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
+              value={keyValue}
+              onChange={(e) => setKeyValue(e.target.value)}
               placeholder="sk-ant-api03-..."
               autoComplete="off"
               spellCheck={false}
               disabled={loading}
             />
             <span className="hint">Stored locally in plain text.</span>
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="anthropic-model">Model</label>
+            <select
+              id="anthropic-model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              disabled={loading}
+            >
+              {MODELS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {saved && (
