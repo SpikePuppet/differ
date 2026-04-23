@@ -7,11 +7,11 @@ import { Masthead } from "./components/Masthead";
 export function App() {
   const route = useRoute();
 
-  if (route.name === "home") return <HomeView />;
-  if (route.name === "repo") return <RepoView repoId={route.repoId} />;
-  if (route.name === "session") return <SessionView sessionId={route.sessionId} />;
-
-  return (
+  let view;
+  if (route.name === "home") view = <HomeView />;
+  else if (route.name === "repo") view = <RepoView repoId={route.repoId} />;
+  else if (route.name === "session") view = <SessionView sessionId={route.sessionId} />;
+  else view = (
     <main className="page">
       <Masthead clickable subtitle="Lost in the stacks" />
       <div className="empty-state">
@@ -19,5 +19,12 @@ export function App() {
         <p>No entry found for <code>#{route.hash}</code>.</p>
       </div>
     </main>
+  );
+
+  return (
+    <>
+      <div className="titlebar-drag" />
+      {view}
+    </>
   );
 }

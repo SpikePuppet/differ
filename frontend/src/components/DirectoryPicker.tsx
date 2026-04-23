@@ -192,12 +192,10 @@ export function DirectoryPicker({ initialPath, onCancel, onSelect }: Props) {
         tabIndex={-1}
       >
         <span className="glyph">{entry.is_git ? <GitGlyph /> : <FolderGlyph />}</span>
-        {featured && (
-          <span className="index">
-            {romanize(idx + 1)}
-            <span className="index-dot">.</span>
-          </span>
-        )}
+        <span className="index" aria-hidden={!featured}>
+          {featured ? romanize(idx + 1) : ""}
+          {featured && <span className="index-dot">.</span>}
+        </span>
         <span className="name">{entry.name}</span>
         {entry.is_git ? (
           <span className="stamp">git tree</span>

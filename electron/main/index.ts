@@ -30,7 +30,9 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
-    title: 'The Review · A Journal of Code in Translation',
+    title: 'Differ',
+    ...(process.platform === 'darwin' && { titleBarStyle: 'hiddenInset' }),
+    backgroundColor: '#efe6d2',
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
