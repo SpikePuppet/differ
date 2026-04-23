@@ -5,12 +5,14 @@ import { RepoRepository } from './repositories/repo'
 import { SessionRepository } from './repositories/session'
 import { CommentRepository } from './repositories/comment'
 import { SettingsRepository } from './repositories/settings'
+import { AiRepository } from './repositories/ai'
 import { GitClient } from './git/client'
 import { RepoService } from './services/repo'
 import { SessionService } from './services/session'
 import { CommentService } from './services/comment'
 import { DiffService } from './services/diff'
 import { SettingsService } from './services/settings'
+import { AiService } from './services/ai'
 import { registerIpc } from './ipc/index'
 
 function createServices(dbPath: string) {
@@ -19,6 +21,7 @@ function createServices(dbPath: string) {
   const sessionRepo = new SessionRepository(db)
   const commentRepo = new CommentRepository(db)
   const settingsRepo = new SettingsRepository(db)
+  const aiRepo = new AiRepository(db)
   const gitClient = new GitClient()
 
   return {
@@ -27,6 +30,7 @@ function createServices(dbPath: string) {
     commentService: new CommentService(repoRepo, sessionRepo, commentRepo, gitClient),
     diffService: new DiffService(repoRepo, sessionRepo, commentRepo, gitClient),
     settingsService: new SettingsService(settingsRepo),
+    aiService: new AiService(aiRepo, settingsRepo, sessionRepo, repoRepo),
   }
 }
 
@@ -54,7 +58,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   if (process.platform === 'darwin') {
-    app.dock?.setIcon(path.join(__dirname, '../../build/icon.icns'))
+    app.dock?.setIcon(path.join(__dirname, '../../build/icon.png'))
   }
 
   const dbPath = path.join(app.getPath('userData'), 'differ.db')

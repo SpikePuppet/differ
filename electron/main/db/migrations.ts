@@ -61,4 +61,20 @@ export const migrations: Migration[] = [
       );
     `,
   },
+  {
+    name: '0003_ai_summaries',
+    sql: `
+      CREATE TABLE IF NOT EXISTS ai_summaries (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        head_commit_sha TEXT NOT NULL,
+        model TEXT NOT NULL,
+        overall_summary TEXT,
+        file_summaries_json TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL,
+        UNIQUE(session_id, head_commit_sha)
+      );
+      CREATE INDEX IF NOT EXISTS idx_ai_summaries_session ON ai_summaries(session_id);
+    `,
+  },
 ]

@@ -15,6 +15,8 @@ export type IpcChannel =
   | 'fs:browse'
   | 'settings:get'
   | 'settings:set'
+  | 'ai:get'
+  | 'ai:generate'
 
 export type IpcErrorCode = 'NOT_FOUND' | 'CONFLICT' | 'VALIDATION' | 'BAD_REQUEST' | 'UNKNOWN'
 
