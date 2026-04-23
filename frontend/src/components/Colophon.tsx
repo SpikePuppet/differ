@@ -10,7 +10,7 @@ export function Colophon({ sessionId }: { sessionId?: string }) {
       </div>
       <div className="center">
         <div className="mark">✦</div>
-        <p>Fraunces · Newsreader · JetBrains Mono</p>
+        <p>© {new Date().getFullYear()} Rhys Johns</p>
       </div>
       <div className="right">
         <div className="mark">₲</div>
