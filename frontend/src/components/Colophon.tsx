@@ -5,15 +5,12 @@ export function Colophon({ sessionId }: { sessionId?: string }) {
         <div className="mark">⁜</div>
         <p className="pub">The Review</p>
         <p>
-          Typeset locally by the Differ Press upon request of the reviewer. No manuscript leaves this machine.
+          Runs locally. No code leaves this machine.
         </p>
       </div>
       <div className="center">
         <div className="mark">✦</div>
         <p>Fraunces · Newsreader · JetBrains Mono</p>
-        <p>
-          <em>For a glossary of proof marks, consult the editor.</em>
-        </p>
       </div>
       <div className="right">
         <div className="mark">₲</div>

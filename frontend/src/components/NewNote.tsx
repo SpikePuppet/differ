@@ -27,14 +27,14 @@ export function NewNote({ anchor, onSubmit, onCancel, disabled }: Props) {
     <article className="margin-note new-note">
       <span className="note-num plus">+</span>
       <div className="authorline">
-        <b>Pen a note</b>
+        <b>Add a comment</b>
         <span className="divider" />
         <span className="stamp">draft</span>
       </div>
       <textarea
         ref={ref}
         value={body}
-        placeholder="Add marginalia…"
+        placeholder="Add a comment…"
         onChange={(e) => setBody(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Escape") onCancel();
@@ -59,7 +59,7 @@ export function NewNote({ anchor, onSubmit, onCancel, disabled }: Props) {
             onClick={submit}
             disabled={disabled || !body.trim()}
           >
-            {disabled ? "Pressing…" : "Pen note"}
+            {disabled ? "Saving…" : "Submit"}
           </button>
         </div>
       </div>

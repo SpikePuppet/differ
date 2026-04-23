@@ -11,7 +11,7 @@ export function Frontispiece({ session, base, head }: Props) {
   return (
     <section className="frontispiece animate">
       <div className="front-lead">
-        <div className="kicker smallcaps">In this number, an impression of</div>
+        <div className="kicker smallcaps">Comparing</div>
         <h2 className="display">
           {head.subject} <em>— a comparison by {head.author_name}</em>
         </h2>
@@ -43,7 +43,7 @@ export function Frontispiece({ session, base, head }: Props) {
           )}
         </p>
         <div className="byline">
-          Composed by <b>{head.author_name}</b>
+          Authored by <b>{head.author_name}</b>
           {head.author_email && (
             <em className="literary" style={{ color: "var(--ink-faint)" }}>
               {" "}
@@ -56,14 +56,14 @@ export function Frontispiece({ session, base, head }: Props) {
       <aside className="colophon">
         <div>
           <div className="smallcaps" style={{ color: "var(--ink-faint)" }}>
-            The comparison
+            Diff
           </div>
         </div>
 
         <div className="ref-card">
           <div className="bullet" aria-hidden="true" />
           <div>
-            <div className="ref-label">Base manuscript</div>
+            <div className="ref-label">Base</div>
             <div className="ref-name">{base.ref ?? shortSha(base.commit)}</div>
             <div className="ref-meta">“{base.subject}”</div>
             <div className="sha">
@@ -75,7 +75,7 @@ export function Frontispiece({ session, base, head }: Props) {
         <div className="ref-card head">
           <div className="bullet" aria-hidden="true" />
           <div>
-            <div className="ref-label">Head revision</div>
+            <div className="ref-label">Compare</div>
             <div className="ref-name">{head.ref ?? shortSha(head.commit)}</div>
             <div className="ref-meta">“{head.subject}”</div>
             <div className="sha">

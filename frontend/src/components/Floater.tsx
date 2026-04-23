@@ -19,7 +19,7 @@ export function Floater({ headSha, openNotes, isArchived, onArchive, onBackToRep
       </button>
       <button>
         <em style={{ fontStyle: "normal", opacity: 0.8 }}>{openNotes}</em>&nbsp;open{" "}
-        {openNotes === 1 ? "note" : "notes"}
+        {openNotes === 1 ? "comment" : "comments"}
       </button>
       {isArchived ? (
         <button className="primary">Archived</button>

@@ -53,16 +53,16 @@ export function HomeView() {
     <main className="page">
       <Masthead clickable={false} />
       <div className="meta-bar">
-        <div className="mb-left smallcaps">Press Room · <em className="literary">The subscribers’ index</em></div>
+        <div className="mb-left smallcaps">Repositories</div>
         <span className="ornament">✦</span>
         <div className="mb-cent smallcaps">Registered Repositories</div>
         <span className="ornament">✦</span>
-        <div className="mb-right smallcaps">{repos ? `${repos.length} in circulation` : "…"}</div>
+        <div className="mb-right smallcaps">{repos ? `${repos.length} registered` : "…"}</div>
       </div>
 
       {error && (
         <Banner tone="err">
-          The press cannot reach its backend. <em className="literary">{error}</em>
+          Cannot reach the backend. <em className="literary">{error}</em>
           <br />
           Start the FastAPI server with{" "}
           <code className="mono">uvicorn differ_api.app:app --reload</code>.
@@ -73,11 +73,10 @@ export function HomeView() {
         <aside className="index-side">
           <h4>Register a repository</h4>
           <p className="hint">
-            Point the press at a local git working tree. It will remain on this machine; nothing is copied or
-            transmitted.
+            Add a local git repository. Everything stays on this machine.
           </p>
           <form onSubmit={onRegister} className="card">
-            <h3>New subscription</h3>
+            <h3>Add repository</h3>
             <p className="intro">Enter the absolute path on disk.</p>
             <div className="form-row">
               <label htmlFor="repo-path">Repository path</label>
@@ -118,7 +117,7 @@ export function HomeView() {
             )}
             <div className="form-actions">
               <button type="submit" className="btn primary" disabled={busy || !path.trim()}>
-                {busy ? "Pressing…" : "Register"}
+                {busy ? "Adding…" : "Add"}
               </button>
             </div>
           </form>
@@ -126,9 +125,9 @@ export function HomeView() {
 
         <section>
           <div className="toc-header" style={{ borderRight: "none", paddingRight: 0, marginBottom: 16 }}>
-            <span className="smallcaps">Catalogue</span>
+            <span className="smallcaps">Repositories</span>
             <h3>
-              Subscribing <em>repositories</em>
+              <em>Registered</em> repositories
             </h3>
           </div>
 
@@ -137,7 +136,7 @@ export function HomeView() {
           ) : repos.length === 0 ? (
             <div className="empty-state">
               <div className="mark">⁂</div>
-              <p>The catalogue is empty. Register a repository to begin.</p>
+              <p>No repositories yet. Add one to get started.</p>
             </div>
           ) : (
             <ol className="catalogue">

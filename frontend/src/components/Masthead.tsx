@@ -23,8 +23,8 @@ export function Masthead({
   volume = "Vol. I",
   issue = 47,
   date,
-  edition = "₲ Local Edition · Single Copy",
-  subtitle = "A journal of code in translation, set in type by the Differ Press",
+  edition = "Local · Offline",
+  subtitle = "A local diff review tool",
   clickable = true,
 }: Props) {
   const resolvedDate = date ?? todayLong();

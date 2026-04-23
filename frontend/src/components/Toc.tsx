@@ -14,7 +14,7 @@ export function Toc({ files, onJump }: Props) {
         <h3>
           In {files.length === 1 ? "one" : files.length === 2 ? "two" : `${files.length}`}
           <br />
-          <em>{files.length === 1 ? "article" : "articles"}</em>
+          <em>{files.length === 1 ? "file" : "files"}</em>
         </h3>
       </header>
       <ol>

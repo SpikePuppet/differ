@@ -27,16 +27,6 @@ const changeChipClass = (change: string): string => {
   return "modified";
 };
 
-const chapterTitles = [
-  "The retiring of an old line",
-  "A plainer rendering",
-  "A new passage",
-  "A quieter construction",
-  "A careful substitution",
-  "An observation from the margin",
-  "The closing paragraph",
-  "A considered pause",
-];
 
 export const Article = forwardRef<HTMLElement, Props>(function Article(
   {
@@ -94,9 +84,6 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
       <header className="article-head">
         <div className="folio">{romanize(index)}.</div>
         <div>
-          <h2>
-            {chapterTitles[index % chapterTitles.length] || "A further correction"}
-          </h2>
           <div className="filepath">
             <span className="seg">{dir.replaceAll("/", " / ")}</span>
             <span className="filename">{filename}</span>
@@ -117,10 +104,9 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
 
       {showDropcap && (
         <p className="preamble dropcap">
-          The article opens with {file.hunks.length} {file.hunks.length === 1 ? "hunk" : "hunks"} of change:{" "}
-          <span style={{ color: "var(--olive)" }}>+{file.additions}</span> set against{" "}
-          <span style={{ color: "var(--vermilion)" }}>−{file.deletions}</span>. Marginalia are gathered on the
-          right, numbered in the order they fall upon the page.
+          This file has {file.hunks.length} {file.hunks.length === 1 ? "hunk" : "hunks"}:{" "}
+          <span style={{ color: "var(--olive)" }}>+{file.additions}</span> added,{" "}
+          <span style={{ color: "var(--vermilion)" }}>−{file.deletions}</span> removed. Comments appear on the right.
         </p>
       )}
 
@@ -129,7 +115,6 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
           key={`${h.old_start}-${h.new_start}-${i}`}
           hunk={h}
           filePath={path}
-          chapterTitle={`Chapter ${romanize(i + 1)} · ${chapterTitles[i % chapterTitles.length]}`}
           commentsForFile={fileComments}
           noteNumbers={noteNumbers}
           selected={selected}
@@ -145,7 +130,7 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
 
       {orphaned.length > 0 && (
         <div style={{ marginTop: 36 }}>
-          <div className="orn small">❧ Addenda ❧</div>
+          <div className="orn small">— Orphaned comments —</div>
           <p
             style={{
               textAlign: "center",
@@ -155,7 +140,7 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
               marginBottom: 20,
             }}
           >
-            Marginalia from an earlier pressing of this file, no longer on the page
+            Comments on lines no longer visible in the diff
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
             {orphaned.map((c) => (

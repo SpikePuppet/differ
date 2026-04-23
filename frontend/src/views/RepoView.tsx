@@ -112,7 +112,7 @@ export function RepoView({ repoId }: { repoId: string }) {
             href={routes.home()}
             style={{ color: "inherit", borderBottom: "1px solid var(--ink-faint)", textDecoration: "none" }}
           >
-            ← Catalogue
+            ← Repositories
           </a>
         </div>
         <span className="ornament">✦</span>
@@ -125,16 +125,15 @@ export function RepoView({ repoId }: { repoId: string }) {
 
       <section className="frontispiece">
         <div className="front-lead">
-          <div className="kicker smallcaps">On the desk today</div>
+          <div className="kicker smallcaps">Repository</div>
           <h2 className="display">
-            {repo.name} <em>, in review</em>
+            {repo.name}
           </h2>
           <p className="dek">
-            A registered working tree at <code className="mono">{repo.path}</code>. Open an existing session to
-            resume a comparison, or commission a new comparison from the composer.
+            Tracking <code className="mono">{repo.path}</code>. Open a session below or start a new comparison.
           </p>
           <div className="byline">
-            Registered <b>{formatDateShort(repo.created_at)}</b> &nbsp;·&nbsp; Last pressed{" "}
+            Added <b>{formatDateShort(repo.created_at)}</b> &nbsp;·&nbsp; Last updated{" "}
             <b>{formatRelative(repo.updated_at)}</b>
           </div>
         </div>
@@ -201,7 +200,7 @@ export function RepoView({ repoId }: { repoId: string }) {
             )}
             <div className="form-actions">
               <button className="btn primary" type="submit" disabled={busy || !baseRef.trim()}>
-                {busy ? "Commissioning…" : "Open session"}
+                {busy ? "Creating…" : "Open session"}
               </button>
             </div>
           </form>
@@ -218,7 +217,7 @@ export function RepoView({ repoId }: { repoId: string }) {
       {active.length === 0 ? (
         <div className="empty-state">
           <div className="mark">⁂</div>
-          <p>No open sessions. Commission one above.</p>
+          <p>No open sessions. Start one above.</p>
         </div>
       ) : (
         <ol className="catalogue">
@@ -255,7 +254,7 @@ export function RepoView({ repoId }: { repoId: string }) {
         <>
           <div className="orn small">❧</div>
           <div className="toc-header" style={{ borderRight: "none", paddingRight: 0 }}>
-            <span className="smallcaps">Back issues</span>
+            <span className="smallcaps">Archived</span>
             <h3>
               <em>Archived</em> sessions
             </h3>

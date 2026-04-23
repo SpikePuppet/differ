@@ -7,7 +7,6 @@ import { NewNote } from "./NewNote";
 interface Props {
   hunk: DiffHunk;
   filePath: string;
-  chapterTitle: string;
   commentsForFile: Comment[];
   noteNumbers: Map<string, number>; // commentId → number
   selected: LineAnchor | null;
@@ -35,7 +34,6 @@ function inHunk(comment: Comment, hunk: DiffHunk): boolean {
 export function HunkBlock({
   hunk,
   filePath,
-  chapterTitle,
   commentsForFile,
   noteNumbers,
   selected,
@@ -81,8 +79,7 @@ export function HunkBlock({
       <div className="hunk-body">
         <div className="hunk-label">
           <span>
-            <em>{chapterTitle}</em>
-            {hunk.header && <span className="hunk-header-text"> &nbsp; {hunk.header}</span>}
+            {hunk.header && <span className="hunk-header-text">{hunk.header}</span>}
           </span>
           <span className="range">
             @@ −{hunk.old_start},{hunk.old_lines} +{hunk.new_start},{hunk.new_lines} @@
@@ -144,8 +141,8 @@ export function HunkBlock({
             }}
           >
             {isArchived
-              ? "Archived. No further marginalia accepted."
-              : "Click a line to pen marginalia."}
+              ? "Archived. No further comments."
+              : "Click a line to add a comment."}
           </div>
         )}
       </aside>

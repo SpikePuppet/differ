@@ -28,7 +28,7 @@ export function MarginNote({ number, comment, onResolve, onReopen, onEdit }: Pro
     <article className={`margin-note${resolved ? " resolved" : ""}${editing ? " editing" : ""}`}>
       <span className="note-num">{number}</span>
       <div className="authorline">
-        <b>Editor</b>
+        <b>You</b>
         <span className="divider" />
         <span className="stamp">{formatRelative(comment.created_at)}</span>
       </div>

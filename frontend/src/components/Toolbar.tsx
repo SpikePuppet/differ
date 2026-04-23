@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type ToolbarTab = "diff" | "marginalia";
+export type ToolbarTab = "diff" | "comments";
 
 interface Props {
   active: ToolbarTab;
@@ -25,12 +25,12 @@ export function Toolbar({ active, onChange, filesCount, notesCount, onRefresh, b
           Diff <span className="count">{filesCount}</span>
         </button>
         <button
-          className={`tab${active === "marginalia" ? " active" : ""}`}
-          onClick={() => onChange("marginalia")}
+          className={`tab${active === "comments" ? " active" : ""}`}
+          onClick={() => onChange("comments")}
           role="tab"
-          aria-selected={active === "marginalia"}
+          aria-selected={active === "comments"}
         >
-          Marginalia <span className="count">{notesCount}</span>
+          Comments <span className="count">{notesCount}</span>
         </button>
       </div>
       <div className="controls">
@@ -45,7 +45,7 @@ export function Toolbar({ active, onChange, filesCount, notesCount, onRefresh, b
             />
             <path d="M13 2v3h-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          {busy ? "Pressing…" : "Re-press"}
+          {busy ? "Refreshing…" : "Refresh"}
         </button>
       </div>
     </div>

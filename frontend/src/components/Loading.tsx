@@ -1,3 +1,3 @@
-export function Loading({ label = "Setting in type…" }: { label?: string }) {
+export function Loading({ label = "Loading…" }: { label?: string }) {
   return <div className="loading">{label}</div>;
 }

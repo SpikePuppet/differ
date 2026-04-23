@@ -136,13 +136,13 @@ export function BranchPicker({ branches = [], current = "", allowUnspecified, lo
           </div>
           <div>
             <span className="smallcaps" style={{ color: "var(--ink-faint)" }}>
-              The bindery
+              Select branch
             </span>
             <h3>
-              Select a <em>setting in type</em>
+              Select a <em>branch</em>
             </h3>
             <p className="head-sub">
-              Choose a branch from the local working tree. The current setting is marked in the margin.
+              Choose a branch from the local working tree. The current branch is marked in the list.
             </p>
           </div>
           <button className="icon-btn" onClick={onCancel} aria-label="Close">
@@ -173,7 +173,7 @@ export function BranchPicker({ branches = [], current = "", allowUnspecified, lo
 
         <div className="picker-list" ref={listRef} role="listbox" aria-label="Branches">
           {loading ? (
-            <div className="picker-empty">Opening the bindery…</div>
+            <div className="picker-empty">Loading branches…</div>
           ) : ordered.length === 0 ? (
             <div className="picker-empty">
               <div className="orn" style={{ margin: 0 }}>
@@ -184,13 +184,13 @@ export function BranchPicker({ branches = [], current = "", allowUnspecified, lo
                   No branches match <em className="literary">"{filter}"</em>.
                 </p>
               ) : (
-                <p>The bindery is empty.</p>
+                <p>No branches found.</p>
               )}
             </div>
           ) : (
             <>
               <div className="section-head">
-                <span className="smallcaps">Local Settings</span>
+                <span className="smallcaps">Local branches</span>
                 <span className="rule" />
                 <span className="smallcaps" style={{ color: "var(--ink-faint)" }}>
                   {ordered.length}

@@ -155,7 +155,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
     return (
       <main className="page">
         <Masthead />
-        <Loading label="Typesetting the edition…" />
+        <Loading label="Loading…" />
       </main>
     );
   }
@@ -165,7 +165,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
       <main className="page">
         <Masthead clickable />
         <Banner tone="err">
-          <em className="literary">{error ?? "The press could not compose this comparison."}</em>
+          <em className="literary">{error ?? "Failed to load this comparison."}</em>
         </Banner>
         {session?.repo_id && (
           <div style={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
@@ -209,8 +209,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
 
       {isArchived && (
         <Banner tone="warn">
-          This session is <em className="literary">archived</em>. It remains readable but accepts no further
-          marginalia or edits.
+          This session is <em className="literary">archived</em>. It is read-only — no new comments or edits.
         </Banner>
       )}
 
@@ -278,7 +277,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
           {diff.files.length === 0 ? (
             <div className="empty-state">
               <div className="mark">⁂</div>
-              <p>Nothing to set. The manuscripts agree in every line.</p>
+              <p>No differences found. The refs are identical.</p>
             </div>
           ) : (
             diff.files.map((f, i) => (
@@ -305,18 +304,18 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         </>
       )}
 
-      {tab === "marginalia" && (
+      {tab === "comments" && (
         <section style={{ marginTop: 40 }}>
           <div className="toc-header" style={{ borderRight: "none", paddingRight: 0, marginBottom: 24 }}>
-            <span className="smallcaps">Every note to date</span>
+            <span className="smallcaps">All comments</span>
             <h3>
-              Collected <em>marginalia</em>
+              Collected <em>comments</em>
             </h3>
           </div>
           {comments.length === 0 ? (
             <div className="empty-state">
               <div className="mark">❧</div>
-              <p>No marginalia yet. Click a line in the Diff tab to pen the first.</p>
+              <p>No comments yet. Click a line in the Diff tab to add one.</p>
             </div>
           ) : (
             <div
