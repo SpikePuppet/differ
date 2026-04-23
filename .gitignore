@@ -21,7 +21,10 @@ htmlcov/
 venv/
 env/
 ENV/
-build/
+build/*
+!build/icon.png
+!build/icon.icns
+!build/icon.ico
 dist/
 *.egg-info/
 
