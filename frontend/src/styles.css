@@ -76,6 +76,15 @@ body::after {
 }
 em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight: 400; }
 
+/* ---------- Electron title bar ---------- */
+.titlebar-drag {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 28px;
+  -webkit-app-region: drag;
+  z-index: 9999;
+}
+
 /* ---------- Page frame ---------- */
 .page {
   max-width: 1440px;
@@ -671,7 +680,7 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
   opacity: .3;
 }
 .modal > * { position: relative; z-index: 1; }
-.modal.picker { max-width: 840px; }
+.modal.picker { max-width: 960px; }
 
 .modal-head {
   padding: 26px 28px 22px;
@@ -838,7 +847,7 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 
 .dir-row {
   display: grid;
-  grid-template-columns: 24px 2.8em 1fr auto 14px;
+  grid-template-columns: 24px 2.2em 1fr auto 14px;
   gap: 14px;
   padding: 10px 28px 10px 22px;
   cursor: pointer;
@@ -865,7 +874,7 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
   text-align: right;
 }
 .dir-row .index .index-dot { color: var(--ink-faint); margin-left: 1px; }
-.dir-row .name { color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dir-row .name { color: var(--ink); word-break: break-word; }
 .dir-row .stamp {
   font-family: "Fraunces", serif;
   font-style: italic;
