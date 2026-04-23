@@ -8,6 +8,7 @@ interface Props {
   edition?: string;
   subtitle?: string;
   clickable?: boolean;
+  onSettings?: () => void;
 }
 
 function todayLong(): string {
@@ -26,6 +27,7 @@ export function Masthead({
   edition = "Local · Offline",
   subtitle = "A local diff review tool",
   clickable = true,
+  onSettings,
 }: Props) {
   const resolvedDate = date ?? todayLong();
   const onClick = clickable ? () => navigate(routes.home()) : undefined;
@@ -45,6 +47,19 @@ export function Masthead({
       </div>
       <h1 className="display">THE REVIEW</h1>
       <div className="subtitle">{subtitle}</div>
+      {onSettings && (
+        <button
+          className="settings-trigger"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSettings();
+          }}
+          title="Preferences (⌘,)"
+          aria-label="Preferences"
+        >
+          §
+        </button>
+      )}
     </header>
   );
 }

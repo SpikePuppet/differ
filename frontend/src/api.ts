@@ -72,4 +72,8 @@ export const api = {
     browse: (path?: string, showHidden = false) =>
       call<FsBrowseResponse>("fs:browse", { path, showHidden }),
   },
+  settings: {
+    get: (key: string) => call<string | null>("settings:get", { key }),
+    set: (key: string, value: string) => call<void>("settings:set", { key, value }),
+  },
 };

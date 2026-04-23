@@ -134,6 +134,26 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 }
 .masthead .subtitle::before { content: "— "; color: var(--ink-faint); }
 .masthead .subtitle::after { content: " —"; color: var(--ink-faint); }
+.settings-trigger {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid var(--ink-faint);
+  color: var(--ink-soft);
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: "Fraunces", serif;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.settings-trigger:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
 /* Meta bar */
 .meta-bar {
