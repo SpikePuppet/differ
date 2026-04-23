@@ -30,6 +30,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
   const [busyCreating, setBusyCreating] = useState(false);
   const [summary, setSummary] = useState<AiSummary | null>(null);
   const [summarizing, setSummarizing] = useState(false);
+  const [summaryError, setSummaryError] = useState(false);
 
   // overrides — allow editing base/head without saving to session
   const [baseRef, setBaseRef] = useState("");
@@ -40,6 +41,9 @@ export function SessionView({ sessionId }: { sessionId: string }) {
   const load = useCallback(
     async (overrides?: CompareOverrides) => {
       setLoading(true);
+      setSummary(null);
+      setSummarizing(false);
+      setSummaryError(false);
       try {
         const s = await api.sessions.get(sessionId);
         setSession(s);
@@ -73,7 +77,8 @@ export function SessionView({ sessionId }: { sessionId: string }) {
                 if (generated) setSummary(generated);
               })
               .catch(() => {
-                // Silent fail — user sees normal diff
+                setSummaryError(true);
+                setTimeout(() => setSummaryError(false), 5000);
               })
               .finally(() => setSummarizing(false));
           }
@@ -273,6 +278,20 @@ export function SessionView({ sessionId }: { sessionId: string }) {
       )}
 
       {summary?.overall && <EditorsAnnotation>{summary.overall}</EditorsAnnotation>}
+
+      {summaryError && (
+        <div
+          style={{
+            padding: "12px 0",
+            fontFamily: "Newsreader, serif",
+            fontStyle: "italic",
+            fontSize: "0.95rem",
+            color: "var(--ink-faint)",
+          }}
+        >
+          The editors could not be reached.
+        </div>
+      )}
 
       <StatsBoard
         filesChanged={diff.stats.files_changed}
