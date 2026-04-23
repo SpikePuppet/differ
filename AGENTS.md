@@ -318,28 +318,26 @@ Shared CSS classes worth knowing: `.page`, `.card`, `.meta-bar`, `.toc-header`, 
   - missing required comparison side after defaults are applied
 
 ## Local Development
-### Backend
-1. Create a virtual environment (`python -m venv .venv && source .venv/bin/activate`).
-2. Install dependencies with `pip install -e '.[dev]'`.
-3. Run the API with `uvicorn differ_api.app:app --reload` (defaults to `http://127.0.0.1:8000`).
-4. Run tests with `pytest`.
-5. Use Alembic for tracked schema changes (`alembic revision --autogenerate -m "..."`, `alembic upgrade head`).
+1. Install dependencies with `npm install`.
+   - `postinstall` runs `electron-builder install-app-deps` to rebuild `better-sqlite3` for Electron.
+2. Run the Electron app with `npm run dev`.
+3. Typecheck all layers with `npm run typecheck`.
+4. Run tests with `npm test`.
 
-### Frontend
-1. `cd frontend`
-2. Install dependencies with `bun install`.
-3. Run the dev server with `bun run dev` (defaults to `http://localhost:3500`, HMR enabled).
-4. Typecheck with `./node_modules/.bin/tsc --noEmit`.
+### Native Module Rebuilds
+`better-sqlite3` is a native C++ addon that must be compiled for the exact Node.js runtime that loads it. Electron bundles its own Node.js, which has a different ABI version than system Node.
 
-The frontend proxies `/api/*` to `http://127.0.0.1:8000`. Override via `DIFFER_API=http://host:port` and port via `PORT=...`. Both servers must be running for the UI to work end-to-end.
+- **For running the app (`npm run dev`):** the module must be built for Electron.
+  - `npm run rebuild:electron` (alias for `electron-builder install-app-deps`)
+- **For running tests (`npm test`):** the module must be built for system Node.
+  - `npm run rebuild:node` (alias for `npm rebuild better-sqlite3`)
 
-See `README.md` for user-facing quickstart.
+If you see `NODE_MODULE_VERSION` mismatch errors, run the appropriate rebuild command for the task at hand.
 
 ## Testing Strategy
 - Tests use real temporary git repositories instead of mocking git history
 - SQLite is created per test run in a temporary file
-- API coverage includes repo registration, session lifecycle, comparisons, comment lifecycle, archive rules, and a workflow smoke test
-- `tests/test_workflow.py` also checks that this document stays aligned with the implemented API surface
+- Coverage includes repo registration, session lifecycle, comparisons, comment lifecycle, archive rules, and a workflow smoke test
 - Frontend is currently covered by typechecking (`tsc --noEmit`); no runtime test suite yet
 
 ## Out of Scope in v1

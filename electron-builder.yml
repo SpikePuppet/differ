@@ -20,3 +20,6 @@ win:
 linux:
   target:
     - AppImage
+
+# Ensure native modules are rebuilt for Electron's Node runtime during packaging
+npmRebuild: true
