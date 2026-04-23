@@ -20,6 +20,8 @@ interface Props {
   showDropcap: boolean;
   isArchived: boolean;
   summary?: string;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 const changeChipClass = (change: string): string => {
@@ -45,6 +47,8 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
     showDropcap,
     isArchived,
     summary,
+    expanded = true,
+    onToggleExpand,
   },
   ref,
 ) {
@@ -83,8 +87,8 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
   }, [file.hunks, fileComments]);
 
   return (
-    <article className="article" ref={ref} id={`article-${index}`}>
-      <header className="article-head">
+    <article className={`article${expanded ? "" : " collapsed"}`} ref={ref} id={`article-${index}`}>
+      <header className="article-head" onClick={onToggleExpand}>
         <div className="folio">{romanize(index)}.</div>
         <div>
           <div className="filepath">
@@ -92,6 +96,7 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
             <span className="filename">{filename}</span>
           </div>
         </div>
+        <span className="article-toggle">{expanded ? "▼" : "▶"}</span>
         <span className={`change-chip ${changeChipClass(file.change_type)}`}>
           {file.change_type === "modified"
             ? "Modified"
@@ -105,61 +110,65 @@ export const Article = forwardRef<HTMLElement, Props>(function Article(
         </span>
       </header>
 
-      {showDropcap && (
-        <p className="preamble dropcap">
-          This file has {file.hunks.length} {file.hunks.length === 1 ? "hunk" : "hunks"}:{" "}
-          <span style={{ color: "var(--olive)" }}>+{file.additions}</span> added,{" "}
-          <span style={{ color: "var(--vermilion)" }}>−{file.deletions}</span> removed. Comments appear on the right.
-        </p>
-      )}
+      {expanded && (
+        <>
+          {showDropcap && (
+            <p className="preamble dropcap">
+              This file has {file.hunks.length} {file.hunks.length === 1 ? "hunk" : "hunks"}:{" "}
+              <span style={{ color: "var(--olive)" }}>+{file.additions}</span> added,{" "}
+              <span style={{ color: "var(--vermilion)" }}>−{file.deletions}</span> removed. Comments appear on the right.
+            </p>
+          )}
 
-      {summary && <EditorsAnnotation>{summary}</EditorsAnnotation>}
+          {summary && <EditorsAnnotation>{summary}</EditorsAnnotation>}
 
-      {file.hunks.map((h, i) => (
-        <HunkBlock
-          key={`${h.old_start}-${h.new_start}-${i}`}
-          hunk={h}
-          filePath={path}
-          commentsForFile={fileComments}
-          noteNumbers={noteNumbers}
-          selected={selected}
-          onSelect={onSelect}
-          busyCreating={busyCreating}
-          onCreateComment={onCreateComment}
-          onResolve={onResolve}
-          onReopen={onReopen}
-          onEdit={onEdit}
-          isArchived={isArchived}
-        />
-      ))}
+          {file.hunks.map((h, i) => (
+            <HunkBlock
+              key={`${h.old_start}-${h.new_start}-${i}`}
+              hunk={h}
+              filePath={path}
+              commentsForFile={fileComments}
+              noteNumbers={noteNumbers}
+              selected={selected}
+              onSelect={onSelect}
+              busyCreating={busyCreating}
+              onCreateComment={onCreateComment}
+              onResolve={onResolve}
+              onReopen={onReopen}
+              onEdit={onEdit}
+              isArchived={isArchived}
+            />
+          ))}
 
-      {orphaned.length > 0 && (
-        <div style={{ marginTop: 36 }}>
-          <div className="orn small">— Orphaned comments —</div>
-          <p
-            style={{
-              textAlign: "center",
-              fontFamily: "Newsreader, serif",
-              fontStyle: "italic",
-              color: "var(--ink-soft)",
-              marginBottom: 20,
-            }}
-          >
-            Comments on lines no longer visible in the diff
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
-            {orphaned.map((c) => (
-              <MarginNote
-                key={c.id}
-                number={noteNumbers.get(c.id) ?? 0}
-                comment={c}
-                onResolve={onResolve}
-                onReopen={onReopen}
-                onEdit={onEdit}
-              />
-            ))}
-          </div>
-        </div>
+          {orphaned.length > 0 && (
+            <div style={{ marginTop: 36 }}>
+              <div className="orn small">— Orphaned comments —</div>
+              <p
+                style={{
+                  textAlign: "center",
+                  fontFamily: "Newsreader, serif",
+                  fontStyle: "italic",
+                  color: "var(--ink-soft)",
+                  marginBottom: 20,
+                }}
+              >
+                Comments on lines no longer visible in the diff
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
+                {orphaned.map((c) => (
+                  <MarginNote
+                    key={c.id}
+                    number={noteNumbers.get(c.id) ?? 0}
+                    comment={c}
+                    onResolve={onResolve}
+                    onReopen={onReopen}
+                    onEdit={onEdit}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </article>
   );

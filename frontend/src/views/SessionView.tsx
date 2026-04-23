@@ -31,6 +31,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
   const [summary, setSummary] = useState<AiSummary | null>(null);
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState(false);
+  const [expanded, setExpanded] = useState<boolean[]>([]);
 
   // overrides — allow editing base/head without saving to session
   const [baseRef, setBaseRef] = useState("");
@@ -54,6 +55,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         setRepo(r);
         setDiff(d);
         setComments(d.comments);
+        setExpanded(d.files.map(() => true));
         setBaseRef((prev) => prev || overrides?.base_ref || s.base_ref);
         setHeadRef((prev) => prev || overrides?.head_ref || s.head_ref || "");
         setError(null);
@@ -174,7 +176,20 @@ export function SessionView({ sessionId }: { sessionId: string }) {
     }
   }, []);
 
+  const toggleExpand = useCallback((i: number) => {
+    setExpanded((prev) => {
+      const next = [...prev];
+      next[i] = !next[i];
+      return next;
+    });
+  }, []);
+
   const jumpToArticle = useCallback((i: number) => {
+    setExpanded((prev) => {
+      const next = [...prev];
+      next[i] = true;
+      return next;
+    });
     const el = articleRefs.current[i];
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
@@ -377,6 +392,8 @@ export function SessionView({ sessionId }: { sessionId: string }) {
                 showDropcap={i === 0}
                 isArchived={!!isArchived}
                 summary={summary?.files[f.new_path || f.old_path]}
+                expanded={expanded[i] ?? true}
+                onToggleExpand={() => toggleExpand(i)}
               />
             ))
           )}

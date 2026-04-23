@@ -337,7 +337,10 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 
 /* Article */
 .article { margin: 72px 0 0; padding-top: 48px; border-top: 3px double var(--rule); position: relative; scroll-margin-top: 24px; }
-.article-head { display: grid; grid-template-columns: 96px 1fr auto; gap: 24px; align-items: end; margin-bottom: 28px; }
+.article-head { display: grid; grid-template-columns: 96px 1fr auto auto; gap: 16px; align-items: end; margin-bottom: 28px; cursor: pointer; transition: background 120ms ease; padding: 8px 12px; margin-left: -12px; margin-right: -12px; border-radius: 2px; }
+.article-head:hover { background: var(--paper-3); }
+.article.collapsed .article-head { margin-bottom: 0; }
+.article-toggle { font-size: 0.72rem; color: var(--ink-faint); user-select: none; }
 .folio {
   font-family: "Fraunces", serif;
   font-variation-settings: "opsz" 144, "SOFT" 40, "WONK" 1;
