@@ -58,7 +58,11 @@ function createWindow() {
 
 app.whenReady().then(() => {
   if (process.platform === 'darwin') {
-    app.dock?.setIcon(path.join(__dirname, '../../build/icon.png'))
+    try {
+      app.dock?.setIcon(path.join(__dirname, '../../build/icon.png'))
+    } catch {
+      // Ignore dock icon errors in production
+    }
   }
 
   const dbPath = path.join(app.getPath('userData'), 'differ.db')
@@ -72,6 +76,8 @@ app.whenReady().then(() => {
       createWindow()
     }
   })
+}).catch((err) => {
+  console.error('Startup error:', err)
 })
 
 app.on('window-all-closed', () => {
