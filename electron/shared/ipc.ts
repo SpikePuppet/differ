@@ -13,6 +13,8 @@ export type IpcChannel =
   | 'comments:resolve'
   | 'comments:reopen'
   | 'fs:browse'
+  | 'settings:get'
+  | 'settings:set'
 
 export type IpcErrorCode = 'NOT_FOUND' | 'CONFLICT' | 'VALIDATION' | 'BAD_REQUEST' | 'UNKNOWN'
 

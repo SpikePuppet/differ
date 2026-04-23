@@ -31,3 +31,8 @@ export interface CommentRow {
   created_at: string
   updated_at: string
 }
+
+export interface SettingsRow {
+  key: string
+  value: string
+}
