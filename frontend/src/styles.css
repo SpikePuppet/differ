@@ -430,6 +430,39 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 .hunk-sep { display: flex; align-items: center; gap: 20px; padding: 10px 18px; background: var(--paper-3); color: var(--ink-soft); font-family: "Newsreader", serif; font-style: italic; font-size: 0.9rem; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
 .hunk-sep::before, .hunk-sep::after { content: ""; flex: 1; border-top: 1px dotted var(--ink-faint); }
 
+/* Editor's annotations (AI summaries) */
+.editors-annotation-content p { margin: 0 0 0.6em; }
+.editors-annotation-content p:last-child { margin-bottom: 0; }
+.editors-annotation-content strong,
+.editors-annotation-content b { font-weight: 500; color: var(--ink); }
+.editors-annotation-content em,
+.editors-annotation-content i { font-style: italic; }
+.editors-annotation-content code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.88em;
+  background: var(--paper-3);
+  padding: 1px 5px;
+  color: var(--ink-soft);
+}
+.editors-annotation-content ul,
+.editors-annotation-content ol {
+  margin: 0.4em 0;
+  padding-left: 1.4em;
+}
+.editors-annotation-content li { margin: 0.2em 0; }
+.editors-annotation-content a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.editors-annotation-content a:hover { color: var(--vermilion); }
+.editors-annotation-content blockquote {
+  margin: 0.6em 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--ink-faint);
+  color: var(--ink-faint);
+}
+
 /* Marginalia */
 .marginalia { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 22px; }
 .margin-note {
