@@ -5,8 +5,8 @@ import { SettingsRepository } from '../repositories/settings'
 import { SessionRepository } from '../repositories/session'
 import { RepoRepository } from '../repositories/repo'
 
-const DEFAULT_MODEL = 'claude-3-5-sonnet-20241022'
-const HAIKU_MODEL = 'claude-3-haiku-20240307'
+const DEFAULT_MODEL = 'claude-sonnet-4-6'
+const HAIKU_MODEL = 'claude-haiku-4-5'
 
 interface DiffResponse {
   base: { ref: string | null; commit: string; subject: string }

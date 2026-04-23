@@ -6,8 +6,8 @@ interface Props {
 }
 
 const MODELS = [
-  { value: "claude-3-5-sonnet-20241022", label: "Claude 3.5 Sonnet" },
-  { value: "claude-3-haiku-20240307", label: "Claude 3 Haiku" },
+  { value: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+  { value: "claude-haiku-4-5", label: "Claude Haiku 4.5" },
 ];
 
 export function SettingsModal({ onClose }: Props) {
