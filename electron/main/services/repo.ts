@@ -28,4 +28,10 @@ export class RepoService {
   listRepos() {
     return this.repoRepo.list()
   }
+
+  async getBranches(repoId: string) {
+    const repo = this.repoRepo.getById(repoId)
+    if (!repo) throw new NotFoundError('Repository not found')
+    return this.gitClient.getBranches(repo.path)
+  }
 }

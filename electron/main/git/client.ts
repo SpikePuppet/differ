@@ -123,6 +123,15 @@ export class GitClient {
     }
   }
 
+  async getBranches(repoPath: string): Promise<{ branches: string[]; current: string }> {
+    const git = this._git(repoPath)
+    const summary = await git.branchLocal()
+    return {
+      branches: summary.all,
+      current: summary.current,
+    }
+  }
+
   async diff(
     repoPath: string,
     {

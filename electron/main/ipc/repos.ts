@@ -13,4 +13,9 @@ export function registerRepoIpc(repoService: RepoService): void {
     const { path } = payload as { path: string }
     return repoService.registerRepo(path)
   })
+
+  handle('repos:branches', (payload: unknown) => {
+    const { id } = payload as { id: string }
+    return repoService.getBranches(id)
+  })
 }
