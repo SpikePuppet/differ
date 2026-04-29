@@ -659,9 +659,11 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
   padding: 18px 6px;
   border-bottom: 1px dotted var(--ink-faint);
   cursor: pointer;
+  transition: background 140ms ease;
 }
 .catalogue li:first-child { border-top: 1px solid var(--ink); }
 .catalogue li:last-child { border-bottom: 1px solid var(--ink); }
+.catalogue li:hover { background: var(--paper-2); }
 .catalogue li:hover .cat-title { color: var(--vermilion); }
 .catalogue li::before {
   content: attr(data-idx) ".";
