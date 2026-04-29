@@ -76,7 +76,7 @@ export function BranchPicker({ branches = [], current = "", allowUnspecified, lo
     return (
       <div
         key={isUnspecified ? "__unspecified__" : branch}
-        className={`dir-row${isCursor ? " cursor" : ""}`}
+        className={`dir-row branch-row${isCursor ? " cursor" : ""}`}
         data-cursor-idx={idx}
         onClick={() => setCursor(idx)}
         onDoubleClick={() => onSelect(isUnspecified ? null : branch)}

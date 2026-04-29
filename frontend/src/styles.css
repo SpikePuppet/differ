@@ -930,7 +930,15 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
   text-align: right;
 }
 .dir-row .index .index-dot { color: var(--ink-faint); margin-left: 1px; }
-.dir-row .name { color: var(--ink); word-break: break-word; }
+.dir-row .name { color: var(--ink); overflow-wrap: break-word; min-width: 0; }
+.branch-row {
+  grid-template-columns: 2.2em 1fr auto auto 14px;
+}
+.branch-row .index { grid-column: 1; }
+.branch-row .name  { grid-column: 2; }
+.branch-row .stamp { grid-column: 3; }
+.branch-row .hint-arrow { grid-column: 4; }
+.branch-row .chev  { grid-column: 5; }
 .dir-row .stamp {
   font-family: "Fraunces", serif;
   font-style: italic;
