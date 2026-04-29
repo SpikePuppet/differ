@@ -24,12 +24,18 @@ export function RepoView({ repoId }: { repoId: string }) {
   // branch picker
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerFor, setPickerFor] = useState<"base" | "head" | null>(null);
-  const [branchData, setBranchData] = useState<{ branches: string[]; current: string } | null>(null);
+  const [branchData, setBranchData] = useState<{
+    branches: string[];
+    current: string;
+  } | null>(null);
   const [pickerError, setPickerError] = useState<string | null>(null);
 
   async function reload() {
     try {
-      const [r, all] = await Promise.all([api.repos.get(repoId), api.sessions.list()]);
+      const [r, all] = await Promise.all([
+        api.repos.get(repoId),
+        api.sessions.list(),
+      ]);
       setRepo(r);
       setSessions(all.filter((s) => s.repo_id === repoId));
       setError(null);
@@ -110,7 +116,11 @@ export function RepoView({ repoId }: { repoId: string }) {
         <div className="mb-left smallcaps">
           <a
             href={routes.home()}
-            style={{ color: "inherit", borderBottom: "1px solid var(--ink-faint)", textDecoration: "none" }}
+            style={{
+              color: "inherit",
+              borderBottom: "1px solid var(--ink-faint)",
+              textDecoration: "none",
+            }}
           >
             ← Repositories
           </a>
@@ -120,21 +130,22 @@ export function RepoView({ repoId }: { repoId: string }) {
           Repository · <em className="literary">{repo.name}</em>
         </div>
         <span className="ornament">✦</span>
-        <div className="mb-right smallcaps">{sessions.length} sessions to date</div>
+        <div className="mb-right smallcaps">
+          {sessions.length} sessions to date
+        </div>
       </div>
 
       <section className="frontispiece">
         <div className="front-lead">
           <div className="kicker smallcaps">Repository</div>
-          <h2 className="display">
-            {repo.name}
-          </h2>
+          <h2 className="display">{repo.name}</h2>
           <p className="dek">
-            Tracking <code className="mono">{repo.path}</code>. Open a session below or start a new comparison.
+            Tracking <code className="mono">{repo.path}</code>. Open a session
+            below or start a new comparison.
           </p>
           <div className="byline">
-            Added <b>{formatDateShort(repo.created_at)}</b> &nbsp;·&nbsp; Last updated{" "}
-            <b>{formatRelative(repo.updated_at)}</b>
+            Added <b>{formatDateShort(repo.created_at)}</b> &nbsp;·&nbsp; Last
+            updated <b>{formatRelative(repo.updated_at)}</b>
           </div>
         </div>
 
@@ -158,7 +169,11 @@ export function RepoView({ repoId }: { repoId: string }) {
                     spellCheck={false}
                     style={{ flex: 1 }}
                   />
-                  <button type="button" className="btn btn-sm" onClick={() => openPicker("base")}>
+                  <button
+                    type="button"
+                    className="btn btn-sm"
+                    onClick={() => openPicker("base")}
+                  >
                     Browse
                   </button>
                 </div>
@@ -175,7 +190,11 @@ export function RepoView({ repoId }: { repoId: string }) {
                     spellCheck={false}
                     style={{ flex: 1 }}
                   />
-                  <button type="button" className="btn btn-sm" onClick={() => openPicker("head")}>
+                  <button
+                    type="button"
+                    className="btn btn-sm"
+                    onClick={() => openPicker("head")}
+                  >
                     Browse
                   </button>
                 </div>
@@ -187,11 +206,13 @@ export function RepoView({ repoId }: { repoId: string }) {
                 id="filters"
                 value={filters}
                 onChange={(e) => setFilters(e.target.value)}
-                placeholder="packages/billing apps/web"
+                placeholder="packages/billing, apps/web"
                 autoComplete="off"
                 spellCheck={false}
               />
-              <span className="hint">Space or comma separated. Repo-relative prefixes.</span>
+              <span className="hint">
+                Space or comma separated. Repo-relative prefixes.
+              </span>
             </div>
             {createError && (
               <Banner tone="err">
@@ -199,7 +220,11 @@ export function RepoView({ repoId }: { repoId: string }) {
               </Banner>
             )}
             <div className="form-actions">
-              <button className="btn primary" type="submit" disabled={busy || !baseRef.trim()}>
+              <button
+                className="btn primary"
+                type="submit"
+                disabled={busy || !baseRef.trim()}
+              >
                 {busy ? "Creating…" : "Open session"}
               </button>
             </div>
@@ -207,7 +232,10 @@ export function RepoView({ repoId }: { repoId: string }) {
         </aside>
       </section>
 
-      <div className="toc-header" style={{ borderRight: "none", paddingRight: 0, marginTop: 56 }}>
+      <div
+        className="toc-header"
+        style={{ borderRight: "none", paddingRight: 0, marginTop: 56 }}
+      >
         <span className="smallcaps">In progress</span>
         <h3>
           <em>Open</em> sessions
@@ -242,7 +270,8 @@ export function RepoView({ repoId }: { repoId: string }) {
                 </div>
               </div>
               <div className="cat-meta">
-                Opened <em className="literary">{formatDateShort(s.created_at)}</em>
+                Opened{" "}
+                <em className="literary">{formatDateShort(s.created_at)}</em>
                 <span className="status open">Open</span>
               </div>
             </li>
@@ -253,7 +282,10 @@ export function RepoView({ repoId }: { repoId: string }) {
       {archived.length > 0 && (
         <>
           <div className="orn small">❧</div>
-          <div className="toc-header" style={{ borderRight: "none", paddingRight: 0 }}>
+          <div
+            className="toc-header"
+            style={{ borderRight: "none", paddingRight: 0 }}
+          >
             <span className="smallcaps">Archived</span>
             <h3>
               <em>Archived</em> sessions
