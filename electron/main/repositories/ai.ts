@@ -14,6 +14,7 @@ export class AiRepository {
   create(data: {
     session_id: string
     head_commit_sha: string
+    provider: string
     model: string
     overall_summary: string | null
     file_summaries_json: string
@@ -22,9 +23,9 @@ export class AiRepository {
     const id = randomUUID()
     this.db
       .prepare(
-        'INSERT INTO ai_summaries (id, session_id, head_commit_sha, model, overall_summary, file_summaries_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO ai_summaries (id, session_id, head_commit_sha, provider, model, overall_summary, file_summaries_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
       )
-      .run(id, data.session_id, data.head_commit_sha, data.model, data.overall_summary, data.file_summaries_json, now)
+      .run(id, data.session_id, data.head_commit_sha, data.provider, data.model, data.overall_summary, data.file_summaries_json, now)
     return this.getById(id)!
   }
 

@@ -41,6 +41,7 @@ export interface AiSummaryRow {
   id: string
   session_id: string
   head_commit_sha: string
+  provider: string
   model: string
   overall_summary: string | null
   file_summaries_json: string

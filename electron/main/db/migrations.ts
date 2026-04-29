@@ -77,4 +77,11 @@ export const migrations: Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_ai_summaries_session ON ai_summaries(session_id);
     `,
   },
+  {
+    name: '0004_ai_provider',
+    sql: `
+      ALTER TABLE ai_summaries ADD COLUMN provider TEXT;
+      UPDATE ai_summaries SET provider = 'anthropic' WHERE provider IS NULL;
+    `,
+  },
 ]

@@ -1,12 +1,15 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { DiffFile } from '../git/adapter'
 import { AiRepository } from '../repositories/ai'
 import { SettingsRepository } from '../repositories/settings'
 import { SessionRepository } from '../repositories/session'
 import { RepoRepository } from '../repositories/repo'
+import { AnthropicProvider, OpenAiProvider, OpenRouterProvider, type LlmProvider } from './ai/providers'
 
-const DEFAULT_MODEL = 'claude-sonnet-4-6'
-const HAIKU_MODEL = 'claude-haiku-4-5'
+const PROVIDER_DEFAULTS: Record<string, string> = {
+  anthropic: 'claude-sonnet-4-6',
+  openai: 'gpt-4o',
+  openrouter: 'anthropic/claude-sonnet-4',
+}
 
 interface DiffResponse {
   base: { ref: string | null; commit: string; subject: string }
@@ -29,12 +32,14 @@ export class AiService {
   ) {}
 
   async generateSummary(sessionId: string, headCommitSha: string, diff: DiffResponse): Promise<AiSummaryResult | null> {
-    const apiKey = this.settingsRepo.get('anthropic_api_key')?.value
+    const providerName = this.settingsRepo.get('ai_provider')?.value ?? 'anthropic'
+    const apiKey = this.settingsRepo.get(`${providerName}_api_key`)?.value
     if (!apiKey) return null
 
-    const model = this.settingsRepo.get('anthropic_model')?.value ?? DEFAULT_MODEL
+    const model = this.settingsRepo.get(`${providerName}_model`)?.value ?? PROVIDER_DEFAULTS[providerName] ?? ''
 
-    const client = new Anthropic({ apiKey })
+    const provider = this.createProvider(providerName, apiKey, model)
+    if (!provider) return null
 
     const { overallPrompt, filePrompts } = this.buildPrompts(diff)
 
@@ -43,15 +48,7 @@ export class AiService {
 
     // Generate overall summary
     try {
-      const response = await client.messages.create({
-        model,
-        max_tokens: 1024,
-        messages: [{ role: 'user', content: overallPrompt }],
-      })
-      const content = response.content[0]
-      if (content.type === 'text') {
-        overall = content.text.trim()
-      }
+      overall = await provider.generate({ prompt: overallPrompt, maxTokens: 1024 })
     } catch {
       overall = null
     }
@@ -59,15 +56,7 @@ export class AiService {
     // Generate per-file summaries for significant changes
     for (const [path, prompt] of Object.entries(filePrompts)) {
       try {
-        const response = await client.messages.create({
-          model,
-          max_tokens: 512,
-          messages: [{ role: 'user', content: prompt }],
-        })
-        const content = response.content[0]
-        if (content.type === 'text') {
-          files[path] = content.text.trim()
-        }
+        files[path] = await provider.generate({ prompt, maxTokens: 512 })
       } catch {
         // Skip files that fail
       }
@@ -77,6 +66,7 @@ export class AiService {
     this.aiRepo.create({
       session_id: sessionId,
       head_commit_sha: headCommitSha,
+      provider: providerName,
       model,
       overall_summary: overall,
       file_summaries_json: JSON.stringify(files),
@@ -91,6 +81,19 @@ export class AiService {
     return {
       overall: row.overall_summary,
       files: JSON.parse(row.file_summaries_json),
+    }
+  }
+
+  private createProvider(name: string, apiKey: string, model: string): LlmProvider | null {
+    switch (name) {
+      case 'anthropic':
+        return new AnthropicProvider(apiKey, model)
+      case 'openai':
+        return new OpenAiProvider(apiKey, model)
+      case 'openrouter':
+        return new OpenRouterProvider(apiKey, model)
+      default:
+        return null
     }
   }
 
