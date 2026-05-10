@@ -585,6 +585,7 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 }
 .floater button:last-child { border-right: none; }
 .floater button.primary { background: var(--vermilion); color: var(--paper); font-style: italic; }
+.floater button.danger { background: var(--vermilion); color: var(--paper); }
 .floater button:hover:not(:disabled):not(.primary) { background: rgba(239,230,210,.08); }
 .floater button:disabled { opacity: 0.35; cursor: not-allowed; }
 .floater .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
@@ -751,6 +752,20 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .card .form-actions .btn.primary { padding: 10px 18px; font-size: 0.92rem; width: 100%; justify-content: center; }
+.front-actions {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.front-actions .hint {
+  font-family: "Newsreader", serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--ink-faint);
+  max-width: 34ch;
+}
 
 /* Index list (repos/sessions) */
 .index-grid { display: grid; grid-template-columns: 280px 1fr; gap: 56px; margin-top: 56px; align-items: start; }
@@ -798,10 +813,29 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 }
 .cat-sub { font-family: "JetBrains Mono", monospace; font-size: 0.82rem; color: var(--ink-faint); }
 .cat-sub .sep { color: var(--ink-faint); margin: 0 8px; }
-.cat-meta { font-family: "Newsreader", serif; font-style: italic; font-size: 0.85rem; color: var(--ink-soft); white-space: nowrap; text-align: right; }
+.cat-meta {
+  font-family: "Newsreader", serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
 .cat-meta .status { display: inline-block; padding: 2px 10px; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--ink); font-style: normal; font-family: "Fraunces", serif; margin-left: 10px; }
 .cat-meta .status.archived { color: var(--ink-faint); border-color: var(--ink-faint); }
 .cat-meta .status.open { border-color: var(--olive); color: var(--olive); }
+.cat-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cat-action {
+  font-style: normal;
+}
 
 .empty-state {
   border: 1px dashed var(--ink-faint);
@@ -1175,6 +1209,25 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
   border: 1px solid var(--vermilion);
   padding: 2px 8px;
   white-space: nowrap;
+}
+
+.confirm-copy {
+  padding: 28px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.confirm-copy p {
+  margin: 0;
+  font-family: "Newsreader", serif;
+  font-size: 1.04rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.confirm-copy .confirm-note {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--ink-faint);
 }
 
 /* Path input with browse button */

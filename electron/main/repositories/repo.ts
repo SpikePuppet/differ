@@ -27,4 +27,13 @@ export class RepoRepository {
   list(): RepoRow[] {
     return this.db.prepare('SELECT * FROM repos ORDER BY created_at').all() as RepoRow[]
   }
+
+  delete(id: string): boolean {
+    const result = this.db.prepare('DELETE FROM repos WHERE id = ?').run(id)
+    return result.changes > 0
+  }
+
+  withTransaction<T>(fn: () => T): T {
+    return this.db.transaction(fn)()
+  }
 }

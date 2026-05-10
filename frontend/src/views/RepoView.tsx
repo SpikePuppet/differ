@@ -4,6 +4,7 @@ import { Banner } from "../components/Banner";
 import { Loading } from "../components/Loading";
 import { Colophon } from "../components/Colophon";
 import { BranchPicker } from "../components/BranchPicker";
+import { ConfirmationModal } from "../components/ConfirmationModal";
 import { api, ApiError } from "../api";
 import type { Repo, Session } from "../types";
 import { navigate, routes } from "../router";
@@ -29,6 +30,9 @@ export function RepoView({ repoId }: { repoId: string }) {
     current: string;
   } | null>(null);
   const [pickerError, setPickerError] = useState<string | null>(null);
+  const [pendingDeleteRepo, setPendingDeleteRepo] = useState<Repo | null>(null);
+  const [pendingDeleteSession, setPendingDeleteSession] = useState<Session | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function reload() {
     try {
@@ -83,6 +87,36 @@ export function RepoView({ repoId }: { repoId: string }) {
       else setCreateError(String(err));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function confirmDeleteRepo() {
+    if (!pendingDeleteRepo) return;
+    setDeletingId(pendingDeleteRepo.id);
+    try {
+      await api.repos.delete(pendingDeleteRepo.id);
+      navigate(routes.home());
+    } catch (err) {
+      if (err instanceof ApiError) setError(err.message);
+      else setError(String(err));
+    } finally {
+      setDeletingId(null);
+      setPendingDeleteRepo(null);
+    }
+  }
+
+  async function confirmDeleteSession() {
+    if (!pendingDeleteSession) return;
+    setDeletingId(pendingDeleteSession.id);
+    try {
+      await api.sessions.delete(pendingDeleteSession.id);
+      setSessions((prev) => (prev ?? []).filter((session) => session.id !== pendingDeleteSession.id));
+      setPendingDeleteSession(null);
+    } catch (err) {
+      if (err instanceof ApiError) setError(err.message);
+      else setError(String(err));
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -146,6 +180,14 @@ export function RepoView({ repoId }: { repoId: string }) {
           <div className="byline">
             Added <b>{formatDateShort(repo.created_at)}</b> &nbsp;·&nbsp; Last
             updated <b>{formatRelative(repo.updated_at)}</b>
+          </div>
+          <div className="front-actions">
+            <button className="btn danger" onClick={() => setPendingDeleteRepo(repo)}>
+              Delete repository
+            </button>
+            <span className="hint">
+              Remove this entry and its stored proofs. The working tree remains on disk.
+            </span>
           </div>
         </div>
 
@@ -270,9 +312,23 @@ export function RepoView({ repoId }: { repoId: string }) {
                 </div>
               </div>
               <div className="cat-meta">
-                Opened{" "}
-                <em className="literary">{formatDateShort(s.created_at)}</em>
+                <span>
+                  Opened{" "}
+                  <em className="literary">{formatDateShort(s.created_at)}</em>
+                </span>
                 <span className="status open">Open</span>
+                <div className="cat-actions">
+                  <button
+                    type="button"
+                    className="btn danger btn-sm cat-action"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setPendingDeleteSession(s);
+                    }}
+                  >
+                    Delete session
+                  </button>
+                </div>
               </div>
             </li>
           ))}
@@ -314,6 +370,18 @@ export function RepoView({ repoId }: { repoId: string }) {
                 </div>
                 <div className="cat-meta">
                   <span className="status archived">Archived</span>
+                  <div className="cat-actions">
+                    <button
+                      type="button"
+                      className="btn danger btn-sm cat-action"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setPendingDeleteSession(s);
+                      }}
+                    >
+                      Delete session
+                    </button>
+                  </div>
                 </div>
               </li>
             ))}
@@ -339,6 +407,53 @@ export function RepoView({ repoId }: { repoId: string }) {
             setPickerOpen(false);
             setPickerFor(null);
           }}
+        />
+      )}
+
+      {pendingDeleteRepo && (
+        <ConfirmationModal
+          eyebrow="Registry"
+          title={
+            <>
+              Delete <em>repository</em>
+            </>
+          }
+          description={
+            <>
+              Remove <code className="mono">{pendingDeleteRepo.name}</code> from the subscribers&apos; index and strike
+              every stored session, comment, and summary bound to it.
+            </>
+          }
+          note="The git working tree remains on disk. Only Differ’s local registration and review records are removed."
+          confirmLabel="Delete repository"
+          busyLabel="Deleting…"
+          busy={deletingId === pendingDeleteRepo.id}
+          onCancel={() => setPendingDeleteRepo(null)}
+          onConfirm={confirmDeleteRepo}
+        />
+      )}
+
+      {pendingDeleteSession && (
+        <ConfirmationModal
+          eyebrow="Proof Room"
+          title={
+            <>
+              Delete <em>session</em>
+            </>
+          }
+          description={
+            <>
+              Strike the proof for <code className="mono">{pendingDeleteSession.base_ref}</code> against{" "}
+              <code className="mono">{pendingDeleteSession.head_ref ?? "unspecified head"}</code>, along with its stored
+              comments and summaries.
+            </>
+          }
+          note="This removes the session from Differ only. The underlying repository and commits are untouched."
+          confirmLabel="Delete session"
+          busyLabel="Deleting…"
+          busy={deletingId === pendingDeleteSession.id}
+          onCancel={() => setPendingDeleteSession(null)}
+          onConfirm={confirmDeleteSession}
         />
       )}
     </main>

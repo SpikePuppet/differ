@@ -15,6 +15,7 @@ import { api, ApiError } from "../api";
 import type { AiSummary, Comment, CommitSummary, CompareOverrides, DiffResponse, Repo, Session } from "../types";
 import { navigate, routes } from "../router";
 import { EditorsAnnotation } from "../components/EditorsAnnotation";
+import { ConfirmationModal } from "../components/ConfirmationModal";
 
 export function SessionView({ sessionId }: { sessionId: string }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -32,6 +33,8 @@ export function SessionView({ sessionId }: { sessionId: string }) {
   const [summarizing, setSummarizing] = useState(false);
   const [summaryError, setSummaryError] = useState(false);
   const [expanded, setExpanded] = useState<boolean[]>([]);
+  const [confirmingAction, setConfirmingAction] = useState<"archive" | "delete" | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
 
   // overrides — allow editing base/head without saving to session
   const [baseRef, setBaseRef] = useState("");
@@ -127,15 +130,32 @@ export function SessionView({ sessionId }: { sessionId: string }) {
     setBusy(false);
   }
 
-  async function archive() {
+  async function confirmArchive() {
     if (!session) return;
-    if (!confirm("Archive this session? It becomes read-only.")) return;
+    setActionBusy(true);
     try {
       const s = await api.sessions.archive(session.id);
       setSession(s);
+      setConfirmingAction(null);
     } catch (err) {
       if (err instanceof ApiError) setError(err.message);
       else setError(String(err));
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
+  async function confirmDeleteSession() {
+    if (!session) return;
+    setActionBusy(true);
+    try {
+      await api.sessions.delete(session.id);
+      navigate(routes.repo(session.repo_id));
+    } catch (err) {
+      if (err instanceof ApiError) setError(err.message);
+      else setError(String(err));
+    } finally {
+      setActionBusy(false);
     }
   }
 
@@ -467,14 +487,52 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         commits={commits}
         currentCommit={diff.head.commit}
         loadingCommits={commitsLoading}
-        busy={loading || busy}
+        busy={loading || busy || actionBusy}
         onCommitSelect={(sha) => {
           setHeadCommit(sha);
           load({ head_commit: sha });
         }}
-        onArchive={archive}
+        onArchive={() => setConfirmingAction("archive")}
+        onDelete={() => setConfirmingAction("delete")}
         onBackToRepo={() => navigate(routes.repo(session.repo_id))}
       />
+
+      {confirmingAction === "archive" && (
+        <ConfirmationModal
+          eyebrow="Proof Room"
+          title={
+            <>
+              Archive <em>session</em>
+            </>
+          }
+          description="Close this proof to further marginalia. The session remains in the catalogue, but new comments and edits will be refused."
+          note="Archiving is reversible only by changing the stored record in code; the current interface treats archived sessions as read-only."
+          confirmLabel="Archive session"
+          busyLabel="Archiving…"
+          confirmClassName="btn primary"
+          busy={actionBusy}
+          onCancel={() => setConfirmingAction(null)}
+          onConfirm={confirmArchive}
+        />
+      )}
+
+      {confirmingAction === "delete" && (
+        <ConfirmationModal
+          eyebrow="Proof Room"
+          title={
+            <>
+              Delete <em>session</em>
+            </>
+          }
+          description="Strike this proof from the ledger and remove every stored comment and summary bound to it."
+          note="The underlying repository, branches, and commits remain untouched. Only Differ’s local review record is removed."
+          confirmLabel="Delete session"
+          busyLabel="Deleting…"
+          busy={actionBusy}
+          onCancel={() => setConfirmingAction(null)}
+          onConfirm={confirmDeleteSession}
+        />
+      )}
     </main>
   );
 }

@@ -25,8 +25,8 @@ function createServices(dbPath: string) {
   const gitClient = new GitClient()
 
   return {
-    repoService: new RepoService(repoRepo, gitClient),
-    sessionService: new SessionService(repoRepo, sessionRepo, gitClient),
+    repoService: new RepoService(repoRepo, sessionRepo, commentRepo, aiRepo, gitClient),
+    sessionService: new SessionService(repoRepo, sessionRepo, commentRepo, aiRepo, gitClient),
     commentService: new CommentService(repoRepo, sessionRepo, commentRepo, gitClient),
     diffService: new DiffService(repoRepo, sessionRepo, commentRepo, gitClient),
     settingsService: new SettingsService(settingsRepo),

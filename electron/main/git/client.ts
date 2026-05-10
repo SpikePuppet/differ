@@ -132,6 +132,10 @@ export class GitClient {
     }
   }
 
+  async listBranches(repoPath: string): Promise<{ branches: string[]; current: string }> {
+    return this.getBranches(repoPath)
+  }
+
   async getCommits(
     repoPath: string,
     ref?: string,

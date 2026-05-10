@@ -4,6 +4,7 @@ import { Banner } from "../components/Banner";
 import { Loading } from "../components/Loading";
 import { Colophon } from "../components/Colophon";
 import { DirectoryPicker } from "../components/DirectoryPicker";
+import { ConfirmationModal } from "../components/ConfirmationModal";
 import { api, ApiError } from "../api";
 import type { Repo } from "../types";
 import { navigate, routes } from "../router";
@@ -16,6 +17,8 @@ export function HomeView() {
   const [busy, setBusy] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<Repo | null>(null);
+  const [deletingRepoId, setDeletingRepoId] = useState<string | null>(null);
 
   async function reload() {
     try {
@@ -46,6 +49,21 @@ export function HomeView() {
       else setRegisterError(String(err));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function deleteRepo() {
+    if (!pendingDelete) return;
+    setDeletingRepoId(pendingDelete.id);
+    try {
+      await api.repos.delete(pendingDelete.id);
+      setRepos((prev) => (prev ?? []).filter((repo) => repo.id !== pendingDelete.id));
+      setPendingDelete(null);
+    } catch (err) {
+      if (err instanceof ApiError) setError(err.message);
+      else setError(String(err));
+    } finally {
+      setDeletingRepoId(null);
     }
   }
 
@@ -155,7 +173,21 @@ export function HomeView() {
                     </div>
                   </div>
                   <div className="cat-meta">
-                    Registered <em className="literary">{formatDateShort(r.created_at)}</em>
+                    <span>
+                      Registered <em className="literary">{formatDateShort(r.created_at)}</em>
+                    </span>
+                    <div className="cat-actions">
+                      <button
+                        type="button"
+                        className="btn danger btn-sm cat-action"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setPendingDelete(r);
+                        }}
+                      >
+                        Delete repository
+                      </button>
+                    </div>
                   </div>
                 </li>
               ))}
@@ -174,6 +206,29 @@ export function HomeView() {
             setPath(selected);
             setPicking(false);
           }}
+        />
+      )}
+
+      {pendingDelete && (
+        <ConfirmationModal
+          eyebrow="Registry"
+          title={
+            <>
+              Delete <em>repository</em>
+            </>
+          }
+          description={
+            <>
+              Remove <code className="mono">{pendingDelete.name}</code> from the catalogue and strike every stored
+              session, comment, and summary bound to it.
+            </>
+          }
+          note="The git working tree remains on disk. Only Differ’s local registration and review records are removed."
+          confirmLabel="Delete repository"
+          busyLabel="Deleting…"
+          busy={deletingRepoId === pendingDelete.id}
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={deleteRepo}
         />
       )}
     </main>

@@ -33,6 +33,11 @@ export function registerSessionIpc(
     return sessionService.archiveSession(id)
   })
 
+  handle('sessions:delete', (payload: unknown) => {
+    const { id } = payload as { id: string }
+    return sessionService.deleteSession(id)
+  })
+
   handle('sessions:compare', (payload: unknown) => {
     const req = payload as {
       sessionId: string

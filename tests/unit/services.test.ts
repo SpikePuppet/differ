@@ -8,6 +8,7 @@ import { createDatabase } from '../../electron/main/db/index'
 import { RepoRepository } from '../../electron/main/repositories/repo'
 import { SessionRepository } from '../../electron/main/repositories/session'
 import { CommentRepository } from '../../electron/main/repositories/comment'
+import { AiRepository } from '../../electron/main/repositories/ai'
 import { GitClient } from '../../electron/main/git/client'
 import { RepoService } from '../../electron/main/services/repo'
 import { SessionService } from '../../electron/main/services/session'
@@ -92,12 +93,14 @@ function makeServices(db: Database.Database, gitClient: GitClient) {
   const repoRepo = new RepoRepository(db)
   const sessionRepo = new SessionRepository(db)
   const commentRepo = new CommentRepository(db)
+  const aiRepo = new AiRepository(db)
 
   return {
-    repoService: new RepoService(repoRepo, gitClient),
-    sessionService: new SessionService(repoRepo, sessionRepo, gitClient),
+    repoService: new RepoService(repoRepo, sessionRepo, commentRepo, aiRepo, gitClient),
+    sessionService: new SessionService(repoRepo, sessionRepo, commentRepo, aiRepo, gitClient),
     commentService: new CommentService(repoRepo, sessionRepo, commentRepo, gitClient),
     diffService: new DiffService(repoRepo, sessionRepo, commentRepo, gitClient),
+    aiRepo,
   }
 }
 
@@ -152,6 +155,52 @@ describe('RepoService', () => {
   it('throws when listing branches for missing repo', async () => {
     await expect(services.repoService.getRepoBranches('no-such-id')).rejects.toThrow('not found')
   })
+
+  it('deletes a repo and all stored review data beneath it', async () => {
+    const repo = services.repoService.listRepos()[0]
+    const session = services.sessionService.createSession({
+      repo_id: repo.id,
+      base_ref: 'main',
+      head_ref: 'feature/diff-comments',
+      path_filters: [],
+    })
+
+    services.aiRepo.create({
+      session_id: session.id,
+      head_commit_sha: ctx.featureTip,
+      provider: 'openai',
+      model: 'gpt-4o',
+      overall_summary: 'A brief summary.',
+      file_summaries_json: '{}',
+    })
+
+    await services.commentService.createComment({
+      session_id: session.id,
+      head_commit_sha: ctx.featureTip,
+      base_commit_sha: ctx.mainTip,
+      file_path: 'packages/pkg-a/service.py',
+      line_side: 'new',
+      line_number: 2,
+      body: 'Delete me with the repository.',
+    })
+
+    const deleted = services.repoService.deleteRepo(repo.id)
+    expect(deleted.id).toBe(repo.id)
+    expect(services.repoService.listRepos()).toHaveLength(0)
+    expect(services.sessionService.listSessions()).toHaveLength(0)
+    const commentRow = ctx.db
+      .prepare('SELECT COUNT(*) as count FROM comments WHERE session_id = ?')
+      .get(session.id) as { count: number }
+    expect(commentRow.count).toBe(0)
+    const aiRow = ctx.db
+      .prepare('SELECT COUNT(*) as count FROM ai_summaries WHERE session_id = ?')
+      .get(session.id) as { count: number }
+    expect(aiRow.count).toBe(0)
+  })
+
+  it('throws when deleting a missing repo', () => {
+    expect(() => services.repoService.deleteRepo('no-such-id')).toThrow('not found')
+  })
 })
 
 describe('SessionService', () => {
@@ -194,6 +243,50 @@ describe('SessionService', () => {
     const sessions = services.sessionService.listSessions()
     const archived = sessions.find((s) => s.status === 'archived')!
     expect(() => services.sessionService.ensureWritable(archived)).toThrow('read-only')
+  })
+
+  it('deletes a session and its dependent records', async () => {
+    const session = services.sessionService.createSession({
+      repo_id: repoId,
+      base_ref: 'main',
+      head_ref: 'feature/diff-comments',
+      path_filters: [],
+    })
+
+    services.aiRepo.create({
+      session_id: session.id,
+      head_commit_sha: ctx.featureTip,
+      provider: 'openai',
+      model: 'gpt-4o',
+      overall_summary: 'A session summary.',
+      file_summaries_json: '{}',
+    })
+
+    await services.commentService.createComment({
+      session_id: session.id,
+      head_commit_sha: ctx.featureTip,
+      base_commit_sha: ctx.mainTip,
+      file_path: 'packages/pkg-a/service.py',
+      line_side: 'new',
+      line_number: 2,
+      body: 'Delete me with the session.',
+    })
+
+    const deleted = services.sessionService.deleteSession(session.id)
+    expect(deleted.id).toBe(session.id)
+    expect(services.sessionService.listSessions().some((entry) => entry.id === session.id)).toBe(false)
+    const commentRow = ctx.db
+      .prepare('SELECT COUNT(*) as count FROM comments WHERE session_id = ?')
+      .get(session.id) as { count: number }
+    expect(commentRow.count).toBe(0)
+    const aiRow = ctx.db
+      .prepare('SELECT COUNT(*) as count FROM ai_summaries WHERE session_id = ?')
+      .get(session.id) as { count: number }
+    expect(aiRow.count).toBe(0)
+  })
+
+  it('throws when deleting a missing session', () => {
+    expect(() => services.sessionService.deleteSession('no-such-id')).toThrow('not found')
   })
 })
 

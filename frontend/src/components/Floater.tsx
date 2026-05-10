@@ -12,6 +12,7 @@ interface Props {
   busy: boolean;
   onCommitSelect: (sha: string) => void;
   onArchive: () => void;
+  onDelete: () => void;
   onBackToRepo: () => void;
 }
 
@@ -25,6 +26,7 @@ export function Floater({
   busy,
   onCommitSelect,
   onArchive,
+  onDelete,
   onBackToRepo,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -162,6 +164,9 @@ export function Floater({
       ) : (
         <button onClick={onArchive}>Archive session</button>
       )}
+      <button className="danger" onClick={onDelete}>
+        Delete session
+      </button>
     </div>
   );
 }

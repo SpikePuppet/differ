@@ -56,6 +56,13 @@ export class SessionRepository {
     return enrichAll(rows)
   }
 
+  listByRepo(repoId: string): EnrichedSessionRow[] {
+    const rows = this.db
+      .prepare('SELECT * FROM sessions WHERE repo_id = ? ORDER BY created_at')
+      .all(repoId) as SessionRow[]
+    return enrichAll(rows)
+  }
+
   archive(id: string): EnrichedSessionRow | undefined {
     const now = new Date().toISOString()
     const result = this.db
@@ -68,5 +75,15 @@ export class SessionRepository {
       return this.getById(id)
     }
     return this.getById(id)
+  }
+
+  delete(id: string): boolean {
+    const result = this.db.prepare('DELETE FROM sessions WHERE id = ?').run(id)
+    return result.changes > 0
+  }
+
+  deleteByRepo(repoId: string): number {
+    const result = this.db.prepare('DELETE FROM sessions WHERE repo_id = ?').run(repoId)
+    return result.changes
   }
 }

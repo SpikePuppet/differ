@@ -9,6 +9,11 @@ export function registerRepoIpc(repoService: RepoService): void {
     return repoService.getRepo(id)
   })
 
+  handle('repos:delete', (payload: unknown) => {
+    const { id } = payload as { id: string }
+    return repoService.deleteRepo(id)
+  })
+
   handle('repos:create', (payload: unknown) => {
     const { path } = payload as { path: string }
     return repoService.registerRepo(path)

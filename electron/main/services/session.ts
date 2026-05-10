@@ -1,5 +1,7 @@
 import { RepoRepository } from '../repositories/repo'
 import { SessionRepository } from '../repositories/session'
+import { CommentRepository } from '../repositories/comment'
+import { AiRepository } from '../repositories/ai'
 import { GitClient } from '../git/client'
 import { NotFoundError, ConflictError } from './errors'
 import { validatePathFilters } from './validators'
@@ -8,6 +10,8 @@ export class SessionService {
   constructor(
     private repoRepo: RepoRepository,
     private sessionRepo: SessionRepository,
+    private commentRepo: CommentRepository,
+    private aiRepo: AiRepository,
     private gitClient: GitClient
   ) {}
 
@@ -47,6 +51,19 @@ export class SessionService {
   archiveSession(sessionId: string) {
     const session = this.sessionRepo.archive(sessionId)
     if (!session) throw new NotFoundError('Session not found')
+    return session
+  }
+
+  deleteSession(sessionId: string) {
+    const session = this.sessionRepo.getById(sessionId)
+    if (!session) throw new NotFoundError('Session not found')
+
+    this.repoRepo.withTransaction(() => {
+      this.aiRepo.deleteBySession(sessionId)
+      this.commentRepo.deleteBySession(sessionId)
+      this.sessionRepo.delete(sessionId)
+    })
+
     return session
   }
 

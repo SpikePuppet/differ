@@ -112,4 +112,18 @@ export class CommentRepository {
     this.db.prepare(sql).run(...params)
     return this.getById(id)
   }
+
+  deleteBySession(sessionId: string): number {
+    const result = this.db.prepare('DELETE FROM comments WHERE session_id = ?').run(sessionId)
+    return result.changes
+  }
+
+  deleteBySessions(sessionIds: string[]): number {
+    if (sessionIds.length === 0) return 0
+    const placeholders = sessionIds.map(() => '?').join(', ')
+    const result = this.db
+      .prepare(`DELETE FROM comments WHERE session_id IN (${placeholders})`)
+      .run(...sessionIds)
+    return result.changes
+  }
 }

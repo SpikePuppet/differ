@@ -53,4 +53,22 @@ describe('api bridge', () => {
     expect(invokeMock).toHaveBeenCalledWith('fs:browse', { path: '/Users', showHidden: true })
     expect(result.path).toBe('/Users')
   })
+
+  it('calls repos:delete with correct payload', async () => {
+    invokeMock.mockResolvedValue({
+      success: true,
+      data: { id: 'repo-1' },
+    })
+    await api.repos.delete('repo-1')
+    expect(invokeMock).toHaveBeenCalledWith('repos:delete', { id: 'repo-1' })
+  })
+
+  it('calls sessions:delete with correct payload', async () => {
+    invokeMock.mockResolvedValue({
+      success: true,
+      data: { id: 'sess-1' },
+    })
+    await api.sessions.delete('sess-1')
+    expect(invokeMock).toHaveBeenCalledWith('sessions:delete', { id: 'sess-1' })
+  })
 })

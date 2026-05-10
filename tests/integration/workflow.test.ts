@@ -7,6 +7,7 @@ import { createDatabase } from '../../electron/main/db/index'
 import { RepoRepository } from '../../electron/main/repositories/repo'
 import { SessionRepository } from '../../electron/main/repositories/session'
 import { CommentRepository } from '../../electron/main/repositories/comment'
+import { AiRepository } from '../../electron/main/repositories/ai'
 import { GitClient } from '../../electron/main/git/client'
 import { RepoService } from '../../electron/main/services/repo'
 import { SessionService } from '../../electron/main/services/session'
@@ -67,13 +68,16 @@ function setupServices(dbPath: string) {
   const repoRepo = new RepoRepository(db)
   const sessionRepo = new SessionRepository(db)
   const commentRepo = new CommentRepository(db)
+  const aiRepo = new AiRepository(db)
   const gitClient = new GitClient()
 
   return {
-    repoService: new RepoService(repoRepo, gitClient),
-    sessionService: new SessionService(repoRepo, sessionRepo, gitClient),
+    repoService: new RepoService(repoRepo, sessionRepo, commentRepo, aiRepo, gitClient),
+    sessionService: new SessionService(repoRepo, sessionRepo, commentRepo, aiRepo, gitClient),
     commentService: new CommentService(repoRepo, sessionRepo, commentRepo, gitClient),
     diffService: new DiffService(repoRepo, sessionRepo, commentRepo, gitClient),
+    aiRepo,
+    db,
   }
 }
 
@@ -172,6 +176,56 @@ describe('integration: sessions', () => {
     rmSync(dbDir, { recursive: true, force: true })
     rmSync(repo.path, { recursive: true, force: true })
   }, 30000)
+
+  it('deletes a session and its stored review artefacts', async () => {
+    const dbDir = mkdtempSync(join(tmpdir(), 'differ-test-'))
+    const dbPath = join(dbDir, 'test.db')
+    const repo = await createSampleGitRepo()
+    const services = setupServices(dbPath)
+
+    const registered = services.repoService.registerRepo(repo.path)
+    const session = services.sessionService.createSession({
+      repo_id: registered.id,
+      base_ref: 'main',
+      head_ref: 'feature/diff-comments',
+      path_filters: [],
+    })
+
+    services.aiRepo.create({
+      session_id: session.id,
+      head_commit_sha: repo.featureTip,
+      provider: 'openai',
+      model: 'gpt-4o',
+      overall_summary: 'Stored summary',
+      file_summaries_json: '{}',
+    })
+
+    const compareResult = await services.diffService.compare({ session_id: session.id })
+    await services.commentService.createComment({
+      session_id: session.id,
+      head_commit_sha: compareResult.head.commit,
+      base_commit_sha: compareResult.base.commit,
+      file_path: 'packages/pkg-a/service.py',
+      line_side: 'new',
+      line_number: 2,
+      body: 'Remove me with the session.',
+    })
+
+    services.sessionService.deleteSession(session.id)
+
+    expect(() => services.sessionService.getSession(session.id)).toThrow('not found')
+    const commentRow = services.db
+      .prepare('SELECT COUNT(*) as count FROM comments WHERE session_id = ?')
+      .get(session.id) as { count: number }
+    expect(commentRow.count).toBe(0)
+    const aiRow = services.db
+      .prepare('SELECT COUNT(*) as count FROM ai_summaries WHERE session_id = ?')
+      .get(session.id) as { count: number }
+    expect(aiRow.count).toBe(0)
+
+    rmSync(dbDir, { recursive: true, force: true })
+    rmSync(repo.path, { recursive: true, force: true })
+  }, 30000)
 })
 
 describe('integration: commits', () => {
@@ -196,6 +250,67 @@ describe('integration: commits', () => {
 
     rmSync(dbDir, { recursive: true, force: true })
     rmSync(repo.path, { recursive: true, force: true })
+  }, 30000)
+})
+
+describe('integration: repo deletion', () => {
+  it('deletes one repository without affecting another', async () => {
+    const dbDir = mkdtempSync(join(tmpdir(), 'differ-test-'))
+    const dbPath = join(dbDir, 'test.db')
+    const firstRepo = await createSampleGitRepo()
+    const secondRepo = await createSampleGitRepo()
+    const services = setupServices(dbPath)
+
+    const first = services.repoService.registerRepo(firstRepo.path)
+    const second = services.repoService.registerRepo(secondRepo.path)
+
+    const firstSession = services.sessionService.createSession({
+      repo_id: first.id,
+      base_ref: 'main',
+      head_ref: 'feature/diff-comments',
+      path_filters: [],
+    })
+    const secondSession = services.sessionService.createSession({
+      repo_id: second.id,
+      base_ref: 'main',
+      head_ref: 'feature/diff-comments',
+      path_filters: [],
+    })
+
+    services.aiRepo.create({
+      session_id: firstSession.id,
+      head_commit_sha: firstRepo.featureTip,
+      provider: 'openai',
+      model: 'gpt-4o',
+      overall_summary: 'First repo summary',
+      file_summaries_json: '{}',
+    })
+
+    const firstCompare = await services.diffService.compare({ session_id: firstSession.id })
+    await services.commentService.createComment({
+      session_id: firstSession.id,
+      head_commit_sha: firstCompare.head.commit,
+      base_commit_sha: firstCompare.base.commit,
+      file_path: 'packages/pkg-a/service.py',
+      line_side: 'new',
+      line_number: 2,
+      body: 'Delete with the first repo.',
+    })
+
+    services.repoService.deleteRepo(first.id)
+
+    expect(services.repoService.listRepos().map((repo) => repo.id)).toEqual([second.id])
+    expect(services.sessionService.listSessions().map((session) => session.id)).toEqual([secondSession.id])
+    const commentRow = services.db
+      .prepare('SELECT COUNT(*) as count FROM comments WHERE session_id = ?')
+      .get(firstSession.id) as { count: number }
+    expect(commentRow.count).toBe(0)
+    expect(() => services.repoService.getRepo(first.id)).toThrow('not found')
+    expect(services.repoService.getRepo(second.id).id).toBe(second.id)
+
+    rmSync(dbDir, { recursive: true, force: true })
+    rmSync(firstRepo.path, { recursive: true, force: true })
+    rmSync(secondRepo.path, { recursive: true, force: true })
   }, 30000)
 })
 

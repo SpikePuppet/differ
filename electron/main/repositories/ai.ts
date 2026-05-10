@@ -32,4 +32,18 @@ export class AiRepository {
   private getById(id: string): AiSummaryRow | undefined {
     return this.db.prepare('SELECT * FROM ai_summaries WHERE id = ?').get(id) as AiSummaryRow | undefined
   }
+
+  deleteBySession(sessionId: string): number {
+    const result = this.db.prepare('DELETE FROM ai_summaries WHERE session_id = ?').run(sessionId)
+    return result.changes
+  }
+
+  deleteBySessions(sessionIds: string[]): number {
+    if (sessionIds.length === 0) return 0
+    const placeholders = sessionIds.map(() => '?').join(', ')
+    const result = this.db
+      .prepare(`DELETE FROM ai_summaries WHERE session_id IN (${placeholders})`)
+      .run(...sessionIds)
+    return result.changes
+  }
 }
