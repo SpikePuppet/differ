@@ -34,4 +34,10 @@ export class RepoService {
     if (!repo) throw new NotFoundError('Repository not found')
     return this.gitClient.getBranches(repo.path)
   }
+
+  async getCommits(repoId: string, ref?: string, maxCount?: number) {
+    const repo = this.repoRepo.getById(repoId)
+    if (!repo) throw new NotFoundError('Repository not found')
+    return this.gitClient.getCommits(repo.path, ref, maxCount)
+  }
 }

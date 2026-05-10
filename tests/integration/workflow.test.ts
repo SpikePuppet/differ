@@ -174,6 +174,31 @@ describe('integration: sessions', () => {
   }, 30000)
 })
 
+describe('integration: commits', () => {
+  it('returns commits for the requested branch even when HEAD is elsewhere', async () => {
+    const dbDir = mkdtempSync(join(tmpdir(), 'differ-test-'))
+    const dbPath = join(dbDir, 'test.db')
+    const repo = await createSampleGitRepo()
+    const services = setupServices(dbPath)
+
+    const registered = services.repoService.registerRepo(repo.path)
+
+    // HEAD is on main; ask for feature branch commits
+    const commits = await services.repoService.getCommits(registered.id, 'feature/diff-comments')
+    expect(commits.length).toBeGreaterThan(0)
+    expect(commits[0].commit).toBe(repo.featureTip)
+    expect(commits[0].subject).toBe('Add feature notes')
+
+    // Asking for main commits should yield main tip, not feature tip
+    const mainCommits = await services.repoService.getCommits(registered.id, 'main')
+    expect(mainCommits[0].commit).toBe(repo.mainTip)
+    expect(mainCommits[0].subject).toBe('Add package version')
+
+    rmSync(dbDir, { recursive: true, force: true })
+    rmSync(repo.path, { recursive: true, force: true })
+  }, 30000)
+})
+
 describe('integration: compare', () => {
   it('compares branch tips', async () => {
     const dbDir = mkdtempSync(join(tmpdir(), 'differ-test-'))

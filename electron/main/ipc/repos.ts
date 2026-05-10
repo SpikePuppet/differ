@@ -18,4 +18,9 @@ export function registerRepoIpc(repoService: RepoService): void {
     const { id } = payload as { id: string }
     return repoService.getBranches(id)
   })
+
+  handle('repos:commits', (payload: unknown) => {
+    const { id, ref, maxCount } = payload as { id: string; ref?: string; maxCount?: number }
+    return repoService.getCommits(id, ref, maxCount)
+  })
 }

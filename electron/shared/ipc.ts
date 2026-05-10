@@ -3,6 +3,7 @@ export type IpcChannel =
   | 'repos:create'
   | 'repos:get'
   | 'repos:branches'
+  | 'repos:commits'
   | 'sessions:list'
   | 'sessions:create'
   | 'sessions:get'

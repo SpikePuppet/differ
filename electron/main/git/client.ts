@@ -132,6 +132,26 @@ export class GitClient {
     }
   }
 
+  async getCommits(
+    repoPath: string,
+    ref?: string,
+    maxCount = 50 // Configurable: raise this if you want deeper history.
+  ): Promise<CommitSummary[]> {
+    const git = this._git(repoPath)
+    const args = ref
+      ? [ref, '-n', maxCount.toString()]
+      : ['-n', maxCount.toString()]
+    const log = await git.log(args)
+    return log.all.map((entry) => ({
+      ref: ref ?? null,
+      commit: entry.hash,
+      author_name: entry.author_name,
+      author_email: entry.author_email,
+      authored_at: new Date(entry.date).toISOString(),
+      subject: entry.message.split('\n')[0],
+    }))
+  }
+
   async diff(
     repoPath: string,
     {
