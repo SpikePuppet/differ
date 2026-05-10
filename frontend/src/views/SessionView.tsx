@@ -12,7 +12,7 @@ import { Floater } from "../components/Floater";
 import { MarginNote } from "../components/MarginNote";
 import type { LineAnchor } from "../components/Line";
 import { api, ApiError } from "../api";
-import type { AiSummary, Comment, CompareOverrides, DiffResponse, Repo, Session } from "../types";
+import type { AiSummary, Comment, CommitSummary, CompareOverrides, DiffResponse, Repo, Session } from "../types";
 import { navigate, routes } from "../router";
 import { EditorsAnnotation } from "../components/EditorsAnnotation";
 
@@ -36,6 +36,11 @@ export function SessionView({ sessionId }: { sessionId: string }) {
   // overrides — allow editing base/head without saving to session
   const [baseRef, setBaseRef] = useState("");
   const [headRef, setHeadRef] = useState("");
+  const [headCommit, setHeadCommit] = useState("");
+
+  // commit history for the head side
+  const [commits, setCommits] = useState<CommitSummary[]>([]);
+  const [commitsLoading, setCommitsLoading] = useState(false);
 
   const articleRefs = useRef<Array<HTMLElement | null>>([]);
 
@@ -58,7 +63,19 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         setExpanded(d.files.map(() => true));
         setBaseRef((prev) => prev || overrides?.base_ref || s.base_ref);
         setHeadRef((prev) => prev || overrides?.head_ref || s.head_ref || "");
+        setHeadCommit((prev) => prev || overrides?.head_commit || d.head.commit);
         setError(null);
+
+        // Fetch commit history for the actual comparison branch
+        const headBranch = d.head.ref || s.head_ref || undefined;
+        if (headBranch) {
+          setCommitsLoading(true);
+          api.repos
+            .commits(r.id, headBranch)
+            .then((list) => setCommits(list))
+            .catch(() => setCommits([]))
+            .finally(() => setCommitsLoading(false));
+        }
 
         // Check for cached AI summary
         try {
@@ -105,6 +122,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
     const overrides: CompareOverrides = {};
     if (baseRef && baseRef !== session?.base_ref) overrides.base_ref = baseRef;
     if (headRef && headRef !== (session?.head_ref ?? "")) overrides.head_ref = headRef;
+    if (headCommit && headCommit !== (diff?.head.commit ?? "")) overrides.head_commit = headCommit;
     await load(Object.keys(overrides).length ? overrides : undefined);
     setBusy(false);
   }
@@ -446,6 +464,14 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         headSha={diff.head.commit}
         openNotes={openNotesCount}
         isArchived={!!isArchived}
+        commits={commits}
+        currentCommit={diff.head.commit}
+        loadingCommits={commitsLoading}
+        busy={loading || busy}
+        onCommitSelect={(sha) => {
+          setHeadCommit(sha);
+          load({ head_commit: sha });
+        }}
         onArchive={archive}
         onBackToRepo={() => navigate(routes.repo(session.repo_id))}
       />

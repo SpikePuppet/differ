@@ -2,6 +2,7 @@ import type {
   Comment,
   CommentCreateRequest,
   CommentUpdateRequest,
+  CommitSummary,
   CompareOverrides,
   DiffResponse,
   FsBrowseResponse,
@@ -49,6 +50,8 @@ export const api = {
     get: (id: string) => call<Repo>("repos:get", { id }),
     create: (path: string) => call<Repo>("repos:create", { path }),
     branches: (id: string) => call<{ branches: string[]; current: string }>("repos:branches", { id }),
+    commits: (id: string, ref?: string, maxCount?: number) =>
+      call<CommitSummary[]>("repos:commits", { id, ref, maxCount }),
   },
   sessions: {
     list: () => call<Session[]>("sessions:list"),

@@ -569,7 +569,6 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
   box-shadow: 0 24px 48px -20px rgba(26,21,12,.6);
   z-index: 50;
   max-width: calc(100vw - 48px);
-  overflow: hidden;
 }
 .floater button {
   background: transparent;
@@ -586,7 +585,8 @@ em.literary { font-family: "Newsreader", serif; font-style: italic; font-weight:
 }
 .floater button:last-child { border-right: none; }
 .floater button.primary { background: var(--vermilion); color: var(--paper); font-style: italic; }
-.floater button:hover:not(.primary) { background: rgba(239,230,210,.08); }
+.floater button:hover:not(:disabled):not(.primary) { background: rgba(239,230,210,.08); }
+.floater button:disabled { opacity: 0.35; cursor: not-allowed; }
 .floater .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
 
 /* Commit dropdown (positioned above floater) */
